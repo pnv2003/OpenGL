@@ -5,10 +5,10 @@
 
 namespace Lab1 {
 	// sample programs
-	void staticSquare();
-	void dynamicSquare();
+	void square();
+	void animatedSquare();
 	void tetrahedron();
-	void movingTetrahedron();
+	void animatedTetrahedron();
 
 	// exercises
 

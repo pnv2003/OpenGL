@@ -5,7 +5,7 @@ using namespace std;
 
 namespace Lab1 {
 	//-----------------------------------------------------
-	void staticSquare() {
+	void square() {
 		glutCreateWindow("static square");
 		glutDisplayFunc([]() {
 			glClear(GL_COLOR_BUFFER_BIT);
@@ -32,7 +32,7 @@ namespace Lab1 {
 		glutPostRedisplay();
 	}
 
-	void dynamicSquare() {
+	void animatedSquare() {
 		
 		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 		glutCreateWindow("dynamic square");
@@ -127,7 +127,7 @@ namespace Lab1 {
 	}
 
 	//-----------------------------------------------------
-	void movingTetrahedron() {
+	void animatedTetrahedron() {
 		angle = 0.0;
 		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 		glutCreateWindow("tetrahedron with camera angles");
