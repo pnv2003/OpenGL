@@ -6,7 +6,7 @@ using namespace std;
 namespace Lab1 {
 	//-----------------------------------------------------
 	void square() {
-		glutCreateWindow("static square");
+		glutCreateWindow("square");
 		glutDisplayFunc([]() {
 			glClear(GL_COLOR_BUFFER_BIT);
 			glColor3f(1.0f, 0.0f, 0.0f);
@@ -35,7 +35,7 @@ namespace Lab1 {
 	void animatedSquare() {
 		
 		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-		glutCreateWindow("dynamic square");
+		glutCreateWindow("animated square");
 		glutDisplayFunc([]() {
 			glClear(GL_COLOR_BUFFER_BIT);
 			glColor3f(1.0f, 0.0f, 0.0f);
@@ -130,7 +130,7 @@ namespace Lab1 {
 	void animatedTetrahedron() {
 		angle = 0.0;
 		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-		glutCreateWindow("tetrahedron with camera angles");
+		glutCreateWindow("animated tetrahedron");
 
 		// init
 		glMatrixMode(GL_PROJECTION);
@@ -186,6 +186,72 @@ namespace Lab1 {
 		});
 
 		glutTimerFunc(100, processTimer, 10);
+		glutMainLoop();
+	}
+
+	//-----------------------------------------------------
+	void fan() {
+		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+		glutInitWindowSize(500, 500);
+		glutCreateWindow("fan");
+
+		// init
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluOrtho2D(-2.0, 2.0, -2.0, 2.0);
+		glClearColor(1.0, 1.0, 1.0, 1.0);
+
+		glutDisplayFunc([]() {
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			glColor3d(0.0, 0.0, 0.0);
+			glPointSize(5.0);
+			glBegin(GL_LINE_LOOP);
+			for (int a = 0; a < 360; a += 10) {
+				glVertex2d(
+					cos(a * DEG2RAD),
+					sin(a * DEG2RAD)
+				);
+			}
+			glEnd();
+
+			glBegin(GL_LINES);
+			for (int a = 0; a < 360; a += 10) {
+				
+				glVertex2d(0.0, 0.0);
+				glVertex2d(
+					cos(a * DEG2RAD),
+					sin(a * DEG2RAD)
+				);
+			}
+			glEnd();
+
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			GLdouble fanColors[3][3] = {
+				{ 1.0, 0.0, 0.0 },
+				{ 0.0, 1.0, 0.0 },
+				{ 0.0, 0.0, 1.0 }
+			};
+			glBegin(GL_TRIANGLES);
+			for (int a = 0; a < 360; a += 120) {
+				glColor3dv(fanColors[a / 120]);
+				glVertex2d(
+					cos((a + angle) * DEG2RAD),
+					sin((a + angle) * DEG2RAD)
+				);
+				glVertex2d(
+					cos((a + angle + 10) * DEG2RAD),
+					sin((a + angle + 10) * DEG2RAD)
+				);
+				glVertex2d(0, 0);
+			}
+			glEnd();
+
+			glutSwapBuffers();
+		});
+
+		glutTimerFunc(100, processTimer, 10);
+
 		glutMainLoop();
 	}
 }

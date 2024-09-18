@@ -11,7 +11,7 @@ namespace Lab1 {
 	void animatedTetrahedron();
 
 	// exercises
-
+	void fan();
 }
 
 #endif

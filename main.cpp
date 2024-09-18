@@ -3,5 +3,5 @@
 #include <GL/glut.h>
 
 int main(int argc, char** argv) {
-	Lab1::animatedTetrahedron();
+	Lab1::fan();
 }
