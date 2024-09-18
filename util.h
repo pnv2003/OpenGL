@@ -1,5 +1,5 @@
-#ifndef SHAPE_H
-#define SHAPE_H
+#ifndef UTIL_H
+#define UTIL_H
 
 #include <GL/glut.h>
 
