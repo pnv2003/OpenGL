@@ -14,4 +14,8 @@ namespace Lab1 {
 	void fan();
 }
 
+namespace Lab2 {
+	int main(int argc, char* argv[]);
+}
+
 #endif

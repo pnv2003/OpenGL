@@ -132,11 +132,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="lab1.cpp" />
+    <ClCompile Include="Lab2.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="supportClass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="example.h" />
     <ClInclude Include="lab.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="supportClass.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
