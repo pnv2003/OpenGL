@@ -1,4 +1,3 @@
-#include "example.h"
 #include "lab.h"
 #include <GL/glut.h>
 
