@@ -18,6 +18,13 @@ namespace Lab2 {
 
 	Mesh	tetrahedron;
 	Mesh	cube;
+	Mesh	cuboid;
+	Mesh	cylinder;
+	Mesh	cylinderWithHole;
+	Mesh	columnFrame4;
+	Mesh	columnFrame2;
+	Mesh	crank;
+	Mesh	slider;
 
 	int		nChoice = 1;
 
@@ -39,7 +46,12 @@ namespace Lab2 {
 	{
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		gluLookAt(4.5, 4, 2, 0, 0, 0, 0, 1, 0);
+		gluLookAt(
+			4.5, 4, 4, 
+			//0, 4, 0,
+			0, 0, 0, 
+			0, 1, 0
+		);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, screenWidth / 2, screenHeight);
@@ -51,6 +63,20 @@ namespace Lab2 {
 			tetrahedron.DrawWireframe();
 		else if (nChoice == 2)
 			cube.DrawWireframe();
+		else if (nChoice == 3)
+			cuboid.DrawWireframe();
+		else if (nChoice == 4)
+			cylinder.DrawWireframe();
+		else if (nChoice == 5)
+			cylinderWithHole.DrawWireframe();
+		else if (nChoice == 6)
+			columnFrame4.DrawWireframe();
+		else if (nChoice == 7)
+			columnFrame2.DrawWireframe();
+		else if (nChoice == 8)
+			crank.DrawWireframe();
+		else if (nChoice == 9)
+			slider.DrawWireframe();
 
 		glViewport(screenWidth / 2, 0, screenWidth / 2, screenHeight);
 
@@ -59,8 +85,22 @@ namespace Lab2 {
 			tetrahedron.DrawColor();
 		else if (nChoice == 2)
 			cube.DrawColor();
+		else if (nChoice == 3)
+			cuboid.DrawColor();
+		else if (nChoice == 4)
+			cylinder.DrawColor();
+		else if (nChoice == 5)
+			cylinderWithHole.DrawColor();
+		else if (nChoice == 6)
+			columnFrame4.DrawColor();
+		else if (nChoice == 7)
+			columnFrame2.DrawColor();
+		else if (nChoice == 8)
+			crank.DrawColor();
+		else if (nChoice == 9)
+			slider.DrawColor();
 
-		glFlush();
+		//glFlush();
 		glutSwapBuffers();
 	}
 
@@ -82,6 +122,13 @@ namespace Lab2 {
 	{
 		cout << "1. Tetrahedron" << endl;
 		cout << "2. Cube" << endl;
+		cout << "3. Cuboid" << endl;
+		cout << "4. Cylinder" << endl;
+		cout << "5. Cylinder with hole" << endl;
+		cout << "6. Column frame with four feet" << endl;
+		cout << "7. Column frame with two feet" << endl;
+		cout << "8. Crank" << endl;
+		cout << "9. Slider" << endl;
 		cout << "Input the choice: " << endl;
 		cin >> nChoice;
 
@@ -93,6 +140,13 @@ namespace Lab2 {
 
 		tetrahedron.CreateTetrahedron();
 		cube.CreateCube(1);
+		cuboid.CreateCuboid(1, 2, 3);
+		cylinder.CreateCylinder(10, 2, 1);
+		cylinderWithHole.CreateCylinderWithHole(10, 2, 1, 0.5);
+		columnFrame4.CreateColumnFrame4(1, 2, 4, 1, 1, 2);
+		columnFrame2.CreateColumnFrame2(1, 2, 4, 1, 2);
+		crank.CreateCrank(0.2, 0.7, 3, 3.5, 5, 0.5, 1, 10);
+		slider.CreateSlider(3, 4, 7, 1);
 
 		myInit();
 		glutDisplayFunc(myDisplay);

@@ -1,90 +1,133 @@
 //#include "stdafx.h"
-#include "Mesh.h"
 #include <math.h>
+#include <vector>
+#include <stdexcept>
+#include "Mesh.h"
+using namespace std;
 
 #define PI			3.1415926
-#define	COLORNUM		14
+#define DEG2RAD		(3.14159/180.0)
+#define	COLORNUM	14
 
 
 float	ColorArr[COLORNUM][3] = { {1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, { 0.0,  0.0, 1.0},
 								{1.0, 1.0,  0.0}, { 1.0, 0.0, 1.0},{ 0.0, 1.0, 1.0},
 								 {0.3, 0.3, 0.3}, {0.5, 0.5, 0.5}, { 0.9,  0.9, 0.9},
 								{1.0, 0.5,  0.5}, { 0.5, 1.0, 0.5},{ 0.5, 0.5, 1.0},
-									{0.0, 0.0, 0.0}, {1.0, 1.0, 1.0} };
-
-
-
-
-
-void Mesh::CreateCylinder(int nSegment, float fHeight, float fRadius)
-{
-	numVerts = nSegment * 2 + 2;
-	pt = new Point3[numVerts];
-
-	int		i;
-	int		idx;
-	float	fAngle = 2 * PI / nSegment;
-	float	x, y, z;
-
-	pt[0].set(0, fHeight / 2, 0);
-	for (i = 0; i < nSegment; i++)
-	{
-		x = fRadius * cos(fAngle * i);
-		z = fRadius * sin(fAngle * i);
-		y = fHeight / 2;
-		pt[i + 1].set(x, y, z);
-
-		y = -fHeight / 2;
-		pt[i + 1 + nSegment].set(x, y, z);
+								{0.0, 0.0, 0.0}, {1.0, 1.0, 1.0} };
+	
+void grid(vector<vector<int>>& lad, const vector<int>& v1, const vector<int>& v2) {
+	if (v1.size() != v2.size())
+		throw runtime_error("Imbalance grid");
+	
+	for (int i = 0; i < v1.size(); ++i) {
+		if (i < v1.size() - 1) {
+			vector<int> face{ v1[i], v1[i + 1], v2[i + 1], v2[i]};
+			lad.push_back(face);
+		}
+		else {
+			vector<int> face{ v1[i], v1[0], v2[0], v2[i] };
+			lad.push_back(face);
+		}
 	}
-	pt[numVerts - 1].set(0, -fHeight / 2, 0);
+}
 
-	numFaces = nSegment * 3;
+void ladder(vector<vector<int>>& lad, const vector<int>& v1, const vector<int>& v2) {
+	if (v1.size() != v2.size())
+		throw runtime_error("Imbalance ladder");
+
+	for (int i = 0; i < v1.size(); i += 2) {
+		if (i == v1.size() - 1) 
+			break;
+
+		vector<int> face{ v1[i], v1[i + 1], v2[i + 1], v2[i] };
+		lad.push_back(face);
+	}
+}
+
+void Mesh::DrawWireframe()
+{
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	for (int f = 0; f < numFaces; f++)
+	{
+		glBegin(GL_POLYGON);
+		for (int v = 0; v < face[f].nVerts; v++)
+		{
+			int		iv = face[f].vert[v].vertIndex;
+
+			glVertex3f(pt[iv].x, pt[iv].y, pt[iv].z);
+		}
+		glEnd();
+	}
+}
+
+void Mesh::DrawColor()
+{
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	for (int f = 0; f < numFaces; f++)
+	{
+		glBegin(GL_POLYGON);
+		for (int v = 0; v < face[f].nVerts; v++)
+		{
+			int		iv = face[f].vert[v].vertIndex;
+			int		ic = face[f].vert[v].colorIndex;
+
+			ic = f % COLORNUM;
+
+			glColor3f(ColorArr[ic][0], ColorArr[ic][1], ColorArr[ic][2]);
+			glVertex3f(pt[iv].x, pt[iv].y, pt[iv].z);
+		}
+		glEnd();
+	}
+}
+
+void Mesh::CreateTetrahedron()
+{
+	int i;
+	numVerts = 4;
+	pt = new Point3[numVerts];
+	pt[0].set(0, 0, 0);
+	pt[1].set(1, 0, 0);
+	pt[2].set(0, 1, 0);
+	pt[3].set(0, 0, 1);
+
+	numFaces = 4;
 	face = new Face[numFaces];
 
-	idx = 0;
-	for (i = 0; i < nSegment; i++)
-	{
-		face[idx].nVerts = 3;
-		face[idx].vert = new VertexID[face[idx].nVerts];
-		face[idx].vert[0].vertIndex = 0;
-		if (i < nSegment - 1)
-			face[idx].vert[1].vertIndex = i + 2;
-		else
-			face[idx].vert[1].vertIndex = 1;
-		face[idx].vert[2].vertIndex = i + 1;
-		idx++;
-	}
+	face[0].nVerts = 3;
+	face[0].vert = new VertexID[face[0].nVerts];
+	face[0].vert[0].vertIndex = 1;
+	face[0].vert[1].vertIndex = 2;
+	face[0].vert[2].vertIndex = 3;
+	for (i = 0; i < face[0].nVerts; i++)
+		face[0].vert[i].colorIndex = 0;
 
-	for (i = 0; i < nSegment; i++)
-	{
-		face[idx].nVerts = 4;
-		face[idx].vert = new VertexID[face[idx].nVerts];
 
-		face[idx].vert[0].vertIndex = i + 1;
-		if (i < nSegment - 1)
-			face[idx].vert[1].vertIndex = i + 2;
-		else
-			face[idx].vert[1].vertIndex = 1;
-		face[idx].vert[2].vertIndex = face[idx].vert[1].vertIndex + nSegment;
-		face[idx].vert[3].vertIndex = face[idx].vert[0].vertIndex + nSegment;
+	face[1].nVerts = 3;
+	face[1].vert = new VertexID[face[1].nVerts];
+	face[1].vert[0].vertIndex = 0;
+	face[1].vert[1].vertIndex = 2;
+	face[1].vert[2].vertIndex = 1;
+	for (i = 0; i < face[1].nVerts; i++)
+		face[1].vert[i].colorIndex = 1;
 
-		idx++;
-	}
 
-	for (i = 0; i < nSegment; i++)
-	{
-		face[idx].nVerts = 3;
-		face[idx].vert = new VertexID[face[idx].nVerts];
-		face[idx].vert[0].vertIndex = numVerts - 1;
-		if (i < nSegment - 1)
-			face[idx].vert[2].vertIndex = i + 2 + nSegment;
-		else
-			face[idx].vert[2].vertIndex = 1 + nSegment;
-		face[idx].vert[1].vertIndex = i + 1 + nSegment;
-		idx++;
-	}
+	face[2].nVerts = 3;
+	face[2].vert = new VertexID[face[2].nVerts];
+	face[2].vert[0].vertIndex = 0;
+	face[2].vert[1].vertIndex = 3;
+	face[2].vert[2].vertIndex = 2;
+	for (i = 0; i < face[2].nVerts; i++)
+		face[2].vert[i].colorIndex = 2;
 
+
+	face[3].nVerts = 3;
+	face[3].vert = new VertexID[face[3].nVerts];
+	face[3].vert[0].vertIndex = 1;
+	face[3].vert[1].vertIndex = 3;
+	face[3].vert[2].vertIndex = 0;
+	for (i = 0; i < face[3].nVerts; i++)
+		face[3].vert[i].colorIndex = 3;
 }
 
 void Mesh::CreateCube(float	fSize)
@@ -168,92 +211,640 @@ void Mesh::CreateCube(float	fSize)
 
 }
 
-
-void Mesh::CreateTetrahedron()
-{
+void Mesh::CreateCuboid(float fSizeX, float fSizeY, float fSizeZ) {
 	int i;
-	numVerts = 4;
-	pt = new Point3[numVerts];
-	pt[0].set(0, 0, 0);
-	pt[1].set(1, 0, 0);
-	pt[2].set(0, 1, 0);
-	pt[3].set(0, 0, 1);
 
-	numFaces = 4;
+	numVerts = 8;
+	pt = new Point3[numVerts];
+	pt[0].set(-fSizeX, fSizeY, fSizeZ);
+	pt[1].set(fSizeX, fSizeY, fSizeZ);
+	pt[2].set(fSizeX, fSizeY, -fSizeZ);
+	pt[3].set(-fSizeX, fSizeY, -fSizeZ);
+	pt[4].set(-fSizeX, -fSizeY, fSizeZ);
+	pt[5].set(fSizeX, -fSizeY, fSizeZ);
+	pt[6].set(fSizeX, -fSizeY, -fSizeZ);
+	pt[7].set(-fSizeX, -fSizeY, -fSizeZ);
+
+	numFaces = 6;
 	face = new Face[numFaces];
 
-	face[0].nVerts = 3;
+	//Left face
+	face[0].nVerts = 4;
 	face[0].vert = new VertexID[face[0].nVerts];
 	face[0].vert[0].vertIndex = 1;
-	face[0].vert[1].vertIndex = 2;
-	face[0].vert[2].vertIndex = 3;
+	face[0].vert[1].vertIndex = 5;
+	face[0].vert[2].vertIndex = 6;
+	face[0].vert[3].vertIndex = 2;
 	for (i = 0; i < face[0].nVerts; i++)
 		face[0].vert[i].colorIndex = 0;
 
-
-	face[1].nVerts = 3;
+	//Right face
+	face[1].nVerts = 4;
 	face[1].vert = new VertexID[face[1].nVerts];
 	face[1].vert[0].vertIndex = 0;
-	face[1].vert[1].vertIndex = 2;
-	face[1].vert[2].vertIndex = 1;
+	face[1].vert[1].vertIndex = 3;
+	face[1].vert[2].vertIndex = 7;
+	face[1].vert[3].vertIndex = 4;
 	for (i = 0; i < face[1].nVerts; i++)
 		face[1].vert[i].colorIndex = 1;
 
-
-	face[2].nVerts = 3;
+	//top face
+	face[2].nVerts = 4;
 	face[2].vert = new VertexID[face[2].nVerts];
 	face[2].vert[0].vertIndex = 0;
-	face[2].vert[1].vertIndex = 3;
+	face[2].vert[1].vertIndex = 1;
 	face[2].vert[2].vertIndex = 2;
+	face[2].vert[3].vertIndex = 3;
 	for (i = 0; i < face[2].nVerts; i++)
 		face[2].vert[i].colorIndex = 2;
 
-
-	face[3].nVerts = 3;
+	//bottom face
+	face[3].nVerts = 4;
 	face[3].vert = new VertexID[face[3].nVerts];
-	face[3].vert[0].vertIndex = 1;
-	face[3].vert[1].vertIndex = 3;
-	face[3].vert[2].vertIndex = 0;
+	face[3].vert[0].vertIndex = 7;
+	face[3].vert[1].vertIndex = 6;
+	face[3].vert[2].vertIndex = 5;
+	face[3].vert[3].vertIndex = 4;
 	for (i = 0; i < face[3].nVerts; i++)
 		face[3].vert[i].colorIndex = 3;
+
+	//near face
+	face[4].nVerts = 4;
+	face[4].vert = new VertexID[face[4].nVerts];
+	face[4].vert[0].vertIndex = 4;
+	face[4].vert[1].vertIndex = 5;
+	face[4].vert[2].vertIndex = 1;
+	face[4].vert[3].vertIndex = 0;
+	for (i = 0; i < face[4].nVerts; i++)
+		face[4].vert[i].colorIndex = 4;
+
+	//Far face
+	face[5].nVerts = 4;
+	face[5].vert = new VertexID[face[5].nVerts];
+	face[5].vert[0].vertIndex = 3;
+	face[5].vert[1].vertIndex = 2;
+	face[5].vert[2].vertIndex = 6;
+	face[5].vert[3].vertIndex = 7;
+	for (i = 0; i < face[5].nVerts; i++)
+		face[5].vert[i].colorIndex = 5;
 }
 
-
-void Mesh::DrawWireframe()
+void Mesh::CreateCylinder(int nSegment, float fHeight, float fRadius)
 {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	for (int f = 0; f < numFaces; f++)
-	{
-		glBegin(GL_POLYGON);
-		for (int v = 0; v < face[f].nVerts; v++)
-		{
-			int		iv = face[f].vert[v].vertIndex;
+	numVerts = nSegment * 2 + 2;
+	pt = new Point3[numVerts];
 
-			glVertex3f(pt[iv].x, pt[iv].y, pt[iv].z);
+	int		i;
+	int		idx;
+	float	fAngle = 2 * PI / nSegment;
+	float	x, y, z;
+
+	pt[0].set(0, fHeight / 2, 0);
+	for (i = 0; i < nSegment; i++)
+	{
+		x = fRadius * cos(fAngle * i);
+		z = fRadius * sin(fAngle * i);
+		y = fHeight / 2;
+		pt[i + 1].set(x, y, z);
+
+		y = -fHeight / 2;
+		pt[i + 1 + nSegment].set(x, y, z);
+	}
+	pt[numVerts - 1].set(0, -fHeight / 2, 0);
+
+	numFaces = nSegment * 3;
+	face = new Face[numFaces];
+
+	idx = 0;
+	for (i = 0; i < nSegment; i++)
+	{
+		face[idx].nVerts = 3;
+		face[idx].vert = new VertexID[face[idx].nVerts];
+		face[idx].vert[0].vertIndex = 0;
+		if (i < nSegment - 1)
+			face[idx].vert[1].vertIndex = i + 2;
+		else
+			face[idx].vert[1].vertIndex = 1;
+		face[idx].vert[2].vertIndex = i + 1;
+		idx++;
+	}
+
+	for (i = 0; i < nSegment; i++)
+	{
+		face[idx].nVerts = 4;
+		face[idx].vert = new VertexID[face[idx].nVerts];
+
+		face[idx].vert[0].vertIndex = i + 1;
+		if (i < nSegment - 1)
+			face[idx].vert[1].vertIndex = i + 2;
+		else
+			face[idx].vert[1].vertIndex = 1;
+		face[idx].vert[2].vertIndex = face[idx].vert[1].vertIndex + nSegment;
+		face[idx].vert[3].vertIndex = face[idx].vert[0].vertIndex + nSegment;
+
+		idx++;
+	}
+
+	for (i = 0; i < nSegment; i++)
+	{
+		face[idx].nVerts = 3;
+		face[idx].vert = new VertexID[face[idx].nVerts];
+		face[idx].vert[0].vertIndex = numVerts - 1;
+		if (i < nSegment - 1)
+			face[idx].vert[2].vertIndex = i + 2 + nSegment;
+		else
+			face[idx].vert[2].vertIndex = 1 + nSegment;
+		face[idx].vert[1].vertIndex = i + 1 + nSegment;
+		idx++;
+	}
+
+}
+
+void Mesh::CreateCylinderWithHole(int nSegment, float fHeight, float fORadius, float fIRadius)
+{
+	numVerts = nSegment * 4;
+	pt = new Point3[numVerts];
+
+	int		i;
+	int		idx;
+	float	fAngle = 2 * PI / nSegment;
+	float	x, y, z;
+
+	for (i = 0; i < nSegment; i++)
+	{
+		x = fORadius * cos(fAngle * i);
+		z = fORadius * sin(fAngle * i);
+		y = fHeight / 2;
+		pt[i].set(x, y, z);
+
+		y = -fHeight / 2;
+		pt[i + nSegment].set(x, y, z);
+	}
+
+	for (i = 0; i < nSegment; i++)
+	{
+		x = fIRadius * cos(fAngle * i);
+		z = fIRadius * sin(fAngle * i);
+		y = fHeight / 2;
+		pt[i + 2 * nSegment].set(x, y, z);
+
+		y = -fHeight / 2;
+		pt[i + 3 * nSegment].set(x, y, z);
+	}
+
+	numFaces = nSegment * 4;
+	face = new Face[numFaces];
+
+	idx = 0;
+
+	/////////////// Outside /////////////////////////
+	for (i = 0; i < nSegment; i++)
+	{
+		face[idx].nVerts = 4;
+		face[idx].vert = new VertexID[face[idx].nVerts];
+
+		face[idx].vert[0].vertIndex = i;
+
+		if (i < nSegment - 1)
+			face[idx].vert[1].vertIndex = i + 1;
+		else
+			face[idx].vert[1].vertIndex = 0;
+
+		face[idx].vert[2].vertIndex = face[idx].vert[1].vertIndex + nSegment;
+		face[idx].vert[3].vertIndex = face[idx].vert[0].vertIndex + nSegment;
+
+		idx++;
+	}
+
+	/////////////// Inside ///////////////////////
+	for (i = 2 * nSegment; i < 3 * nSegment; i++)
+	{
+		face[idx].nVerts = 4;
+		face[idx].vert = new VertexID[face[idx].nVerts];
+
+		face[idx].vert[1].vertIndex = i;
+
+		if (i < 3 * nSegment - 1)
+			face[idx].vert[0].vertIndex = i + 1;
+		else
+			face[idx].vert[0].vertIndex = 2 * nSegment;
+
+		face[idx].vert[2].vertIndex = face[idx].vert[1].vertIndex + nSegment;
+		face[idx].vert[3].vertIndex = face[idx].vert[0].vertIndex + nSegment;
+
+		idx++;
+	}
+	////////////////  Top ////////////////////////////
+	for (i = 0; i < nSegment; i++)
+	{
+		face[idx].nVerts = 4;
+		face[idx].vert = new VertexID[face[idx].nVerts];
+
+		face[idx].vert[1].vertIndex = i;
+
+		if (i < nSegment - 1)
+			face[idx].vert[0].vertIndex = i + 1;
+		else
+			face[idx].vert[0].vertIndex = 0;
+
+		face[idx].vert[2].vertIndex = face[idx].vert[1].vertIndex + 2 * nSegment;
+		face[idx].vert[3].vertIndex = face[idx].vert[0].vertIndex + 2 * nSegment;
+
+		idx++;
+	}
+	//////////////// Bottom ////////////////////////
+	for (i = 0; i < nSegment; i++)
+	{
+		face[idx].nVerts = 4;
+		face[idx].vert = new VertexID[face[idx].nVerts];
+
+		face[idx].vert[0].vertIndex = i + nSegment;
+
+		if (i < nSegment - 1)
+			face[idx].vert[1].vertIndex = i + nSegment + 1;
+		else
+			face[idx].vert[1].vertIndex = nSegment;
+
+		face[idx].vert[2].vertIndex = face[idx].vert[1].vertIndex + 2 * nSegment;
+		face[idx].vert[3].vertIndex = face[idx].vert[0].vertIndex + 2 * nSegment;
+
+		idx++;
+	}
+
+}
+
+void Mesh::CreateColumnFrame4(
+	double bodyX, double bodyY, double bodyZ,
+	double feetLength,
+	double feetHeight,
+	double feetDistance
+) {
+	int i;
+
+	numVerts = 16;
+	pt = new Point3[numVerts];
+
+	double hTotal = bodyZ + feetDistance + feetHeight;
+	double bodyX2 = bodyX / 2;
+	double bodyY2 = bodyY / 2;
+	double feetX2 = (bodyX + feetLength) / 2;
+	double feetY2 = (bodyY + feetHeight) / 2;
+
+	double hTop = hTotal / 2;
+	double hMid1 = -hTotal / 2 + feetHeight + feetDistance;
+	double hMid2 = -hTotal / 2 + feetHeight;
+	double hBot = -hTotal / 2;
+
+	pt[0].set(bodyX2, -bodyY2, hTop);
+	pt[1].set(-bodyX2, -bodyY2, hTop);
+	pt[2].set(-bodyX2, bodyY2, hTop);
+	pt[3].set(bodyX2, bodyY2, hTop);
+
+	pt[4].set(bodyX2, -bodyY2, hMid1);
+	pt[5].set(-bodyX2, -bodyY2, hMid1);
+	pt[6].set(-bodyX2, bodyY2, hMid1);
+	pt[7].set(bodyX2, bodyY2, hMid1);
+
+	pt[8].set(feetX2, -feetY2, hMid2);
+	pt[9].set(-feetX2, -feetY2, hMid2);
+	pt[10].set(-feetX2, feetY2, hMid2);
+	pt[11].set(feetX2, feetY2, hMid2);
+
+	pt[12].set(feetX2, -feetY2, hBot);
+	pt[13].set(-feetX2, -feetY2, hBot);
+	pt[14].set(-feetX2, feetY2, hBot);
+	pt[15].set(feetX2, feetY2, hBot);
+
+	numFaces = 14;
+	face = new Face[numFaces];
+
+	int faces[14][4] = {
+		// top
+		{0, 1, 2, 3},
+
+		// side1
+		{0, 1, 5, 4},
+		{1, 2, 6, 5},
+		{2, 3, 7, 6},
+		{3, 0, 4, 7},
+
+		// side2
+		{4, 5, 9, 8},
+		{5, 6, 10, 9},
+		{6, 7, 11, 10},
+		{7, 4, 8, 11},
+
+		//side3
+		{8, 9, 13, 12},
+		{9, 10, 14, 13},
+		{10, 11, 15, 14},
+		{11, 8, 12, 15},
+
+		// bottom
+		{12, 13, 14, 15}
+	};
+
+	for (i = 0; i < numFaces; i++) {
+		face[i].nVerts = 4;
+		face[i].vert = new VertexID[face[i].nVerts];
+		for (int j = 0; j < 4; j++) {
+			face[i].vert[j].vertIndex = faces[i][j];
 		}
-		glEnd();
 	}
 }
 
-void Mesh::DrawColor()
-{
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	for (int f = 0; f < numFaces; f++)
-	{
-		glBegin(GL_POLYGON);
-		for (int v = 0; v < face[f].nVerts; v++)
-		{
-			int		iv = face[f].vert[v].vertIndex;
-			int		ic = face[f].vert[v].colorIndex;
+void Mesh::CreateColumnFrame2(
+	double bodyX, double bodyY, double bodyZ,
+	double feetLength,
+	double feetDistance
+) {
+	int i;
 
-			ic = f % COLORNUM;
+	numVerts = 12;
+	pt = new Point3[numVerts];
 
-			glColor3f(ColorArr[ic][0], ColorArr[ic][1], ColorArr[ic][2]);
-			glVertex3f(pt[iv].x, pt[iv].y, pt[iv].z);
+	double hTotal = bodyZ + feetDistance;
+	double bodyX2 = bodyX / 2;
+	double bodyY2 = bodyY / 2;
+	double feetX2 = (bodyX + feetLength) / 2;
+	double feetY2 = (bodyY + feetLength) / 2;
+
+	double hTop = hTotal / 2;
+	double hMid = -hTotal / 2 + feetDistance;
+	double hBot = -hTotal / 2;
+
+	pt[0].set(bodyX2, -bodyY2, hTop);
+	pt[1].set(-bodyX2, -bodyY2, hTop);
+	pt[2].set(-bodyX2, bodyY2, hTop);
+	pt[3].set(bodyX2, bodyY2, hTop);
+
+	pt[4].set(bodyX2, -bodyY2, hMid);
+	pt[5].set(-bodyX2, -bodyY2, hMid);
+	pt[6].set(-bodyX2, bodyY2, hMid);
+	pt[7].set(bodyX2, bodyY2, hMid);
+
+	pt[8].set(feetX2, -feetY2, hBot);
+	pt[9].set(-feetX2, -feetY2, hBot);
+	pt[10].set(-feetX2, feetY2, hBot);
+	pt[11].set(feetX2, feetY2, hBot);
+
+	numFaces = 10;
+	face = new Face[numFaces];
+
+	int faces[10][4] = {
+		// top
+		{0, 1, 2, 3},
+
+		// side1
+		{0, 1, 5, 4},
+		{1, 2, 6, 5},
+		{2, 3, 7, 6},
+		{3, 0, 4, 7},
+
+		//side2
+		{4, 5, 9, 8},
+		{5, 6, 10, 9},
+		{6, 7, 11, 10},
+		{7, 4, 8, 11},
+
+		// bottom
+		{8, 9, 10, 11}
+	};
+
+	for (i = 0; i < numFaces; i++) {
+		face[i].nVerts = 4;
+		face[i].vert = new VertexID[face[i].nVerts];
+		for (int j = 0; j < 4; j++) {
+			face[i].vert[j].vertIndex = faces[i][j];
 		}
-		glEnd();
 	}
 }
 
+void Mesh::CreateCrank(
+	double inR1, double inR2,
+	double outR1, double outR2,
+	int nSpoke, double spokeWidth,
+	double thickness, int nSegment
+) {
+	numVerts = nSegment * 8 + nSpoke * 8;
+	pt = new Point3[numVerts];
 
+	int	i;
+	int	idx;
+	double angle = 2 * PI / nSegment;
+	double x, y, z;
 
+	double hTop = thickness / 2;
+	double hBot = -thickness / 2;
+
+	// circles
+	// 0 -> nseg*2: inR1
+	// nseg*2 -> nseg*4: inR2
+	// nseg*4 -> nseg*6: outR1
+	// nseg*6 -> nseg*8: outR2
+	// 1st half: top, 2nd half: bot
+	vector<int> ptIndex{ 0, nSegment * 2, nSegment * 4, nSegment * 6 };
+	vector<double> rad{ inR1, inR2, outR1, outR2 };
+
+	for (int j = 0; j < 4; ++j) {
+		idx = ptIndex[j];
+		double radius = rad[j];
+
+		for (i = 0; i < nSegment; i++)
+		{
+			x = radius * cos(angle * i);
+			y = radius * sin(angle * i);
+			z = hTop;
+			pt[idx + i].set(x, y, z);
+
+			z = hBot;
+			pt[idx + i + nSegment].set(x, y, z);
+		}
+	}
+
+	// spokes
+	// nseg*8 -> nseg*8 + nspoke*4: inR2
+	// nseg*8 + nspoke*4 -> nseg*8 + nspoke*8: outR1
+	// 1st half: top, 2nd half: bot (each half has 2*nspoke points)
+	ptIndex = { 
+		nSegment * 8, 
+		nSegment * 8 + nSpoke * 4 
+	};
+	rad = { inR2, outR1 };
+	angle = 2 * PI / nSpoke;
+	for (i = 0; i < 2; ++i) {
+		double theta = asin(spokeWidth / 2 / rad[i]);
+		idx = ptIndex[i];
+		double radius = rad[i];
+
+		for (int s = 0; s < nSpoke; ++s) {
+			x = radius * cos(angle * s - theta);
+			y = radius * sin(angle * s - theta);
+			z = hTop;
+			pt[idx + s*2].set(x, y, z);
+			z = hBot;
+			pt[idx + s*2 + nSpoke*2].set(x, y, z);
+
+			x = radius * cos(angle * s + theta);
+			y = radius * sin(angle * s + theta);
+			z = hTop;
+			pt[idx + s*2 + 1].set(x, y, z);
+			z = hBot;
+			pt[idx + s*2 + nSpoke*2 + 1].set(x, y, z);
+		}
+	}
+
+	numFaces = nSegment * 8 + nSpoke * 4;
+	face = new Face[numFaces];
+
+	vector<int> v1{};
+	vector<int> v2{};
+	vector<int> v3{};
+	vector<int> v4{};
+	vector<int> v5{};
+	vector<int> v6{};
+	vector<int> v7{};
+	vector<int> v8{};
+
+	vector<int> vs1{};
+	vector<int> vs2{};
+	vector<int> vs3{};
+	vector<int> vs4{};
+	vector<int> vs5{};
+	vector<int> vs6{};
+
+	for (i = 0; i < nSegment; ++i) {
+		v1.push_back(i);
+		v2.push_back(i + nSegment);
+		v3.push_back(i + nSegment * 2);
+		v4.push_back(i + nSegment * 3);
+		v5.push_back(i + nSegment * 4);
+		v6.push_back(i + nSegment * 5);
+		v7.push_back(i + nSegment * 6);
+		v8.push_back(i + nSegment * 7);
+	}
+
+	for (i = 0; i < nSpoke*2; ++i) {
+		vs1.push_back(i + nSegment * 8); // inR2 top
+		vs2.push_back(i + nSegment * 8 + nSpoke * 2); // inR2 bot
+		vs3.push_back(i + nSegment * 8 + nSpoke * 4); // outR1 top
+		vs4.push_back(i + nSegment * 8 + nSpoke * 6); // outR1 bot
+	}
+
+	for (i = 0; i < nSpoke * 2; ++i) {
+		// inR2 vertical
+		vs5.push_back(i + nSegment * 8);
+		vs5.push_back(i + nSegment * 8 + nSpoke * 2);
+
+		// outR1 vertical
+		vs6.push_back(i + nSegment * 8 + nSpoke * 4);
+		vs6.push_back(i + nSegment * 8 + nSpoke * 6);
+	}
+
+	vector<vector<int>> faces{};
+
+	// 1-3		5-7
+	// | |		| |
+	// 2-4		6-8
+	grid(faces, v1, v2);
+	grid(faces, v2, v4);
+	grid(faces, v4, v3);
+	grid(faces, v3, v1);
+
+	grid(faces, v5, v6);
+	grid(faces, v6, v8);
+	grid(faces, v8, v7);
+	grid(faces, v7, v5);
+
+	ladder(faces, vs1, vs3);
+	ladder(faces, vs2, vs4);
+	ladder(faces, vs5, vs6);
+
+	if (faces.size() != numFaces)
+		throw runtime_error("nooooo");
+
+	for (i = 0; i < numFaces; i++) {
+		face[i].nVerts = 4;
+		face[i].vert = new VertexID[face[i].nVerts];
+		for (int j = 0; j < 4; j++) {
+			face[i].vert[j].vertIndex = faces[i][j];
+		}
+	}
+}
+
+void Mesh::CreateSlider(
+	double x, double y, double z, 
+	double thickness
+) {
+	int i;
+
+	numVerts = 16;
+	pt = new Point3[numVerts];
+
+	double hTop1 = z / 2;
+	double hBot1 = -z / 2;
+	double hTop2 = (z - thickness) / 2;
+	double hBot2 = -(z - thickness) / 2;;
+
+	double xOut = x / 2;
+	double yOut = y / 2;
+	double xIn = x / 2;
+	double yIn = (y - thickness) / 2;
+
+	pt[0].set(xOut, -yOut, hTop1);
+	pt[1].set(-xOut, -yOut, hTop1);
+	pt[2].set(-xOut, yOut, hTop1);
+	pt[3].set(xOut, yOut, hTop1);
+
+	pt[4].set(xIn, -yIn, hTop2);
+	pt[5].set(-xIn, -yIn, hTop2);
+	pt[6].set(-xIn, yIn, hTop2);
+	pt[7].set(xIn, yIn, hTop2);
+
+	pt[8].set(xIn, -yIn, hBot2);
+	pt[9].set(-xIn, -yIn, hBot2);
+	pt[10].set(-xIn, yIn, hBot2);
+	pt[11].set(xIn, yIn, hBot2);
+
+	pt[12].set(xOut, -yOut, hBot1);
+	pt[13].set(-xOut, -yOut, hBot1);
+	pt[14].set(-xOut, yOut, hBot1);
+	pt[15].set(xOut, yOut, hBot1);
+
+	numFaces = 16;
+	face = new Face[numFaces];
+
+	int faces[16][4] = {
+		// top
+		{ 0, 1, 2, 3 },
+		{ 0, 3, 7, 4 },
+		{ 1, 2, 6, 5 },
+		{ 4, 5, 6, 7 },
+
+		// side1
+		{ 0, 1, 13, 12 },
+		{ 0, 4, 8, 12 },
+		{ 1, 5, 9, 13 },
+		{ 4, 5, 9, 8 },
+
+		// side2
+		{ 2, 3, 15, 14 },
+		{ 2, 6, 10, 14 },
+		{ 3, 7, 11, 15 },
+		{ 6, 7, 11, 10 },
+
+		// bot
+		{ 8, 9, 10, 11 },
+		{ 8, 11, 15, 12 },
+		{ 9, 10, 14, 13 },
+		{ 12, 13, 14, 15 }
+	};
+
+	for (i = 0; i < numFaces; i++) {
+		face[i].nVerts = 4;
+		face[i].vert = new VertexID[face[i].nVerts];
+		for (int j = 0; j < 4; j++) {
+			face[i].vert[j].vertIndex = faces[i][j];
+		}
+	}
+}

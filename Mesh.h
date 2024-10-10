@@ -67,7 +67,33 @@ public:
 
 	void CreateTetrahedron();
 	void CreateCube(float	fSize);
+	void CreateCuboid(float fSizeX, float fSizeY, float fSizeZ);
 	void CreateCylinder(int nSegment, float fHeight, float fRadius);
+	void CreateCylinderWithHole(int nSegment, float fHeight, float fORadius, float fIRadius);
+
+	// scotch yoke components
+	void CreateColumnFrame4(
+		double bodyX, double bodyY, double bodyZ, 
+		double feetLength,
+		double feetHeight,
+		double feetDistance
+	);
+	void CreateColumnFrame2(
+		double bodyX, double bodyY, double bodyZ,
+		double feetLength,
+		double feetDistance
+	);
+	void CreateCrank(
+		double inR1, double inR2,
+		double outR1, double outR2,
+		int nSpoke, double spokeWidth,
+		double thickness, int nSegment
+	);
+	void CreateSlider(
+		double x, double y, double z, 
+		double thickness
+	);
+
 };
 
 #endif
