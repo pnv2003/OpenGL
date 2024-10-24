@@ -473,7 +473,7 @@ void Mesh::CreateCylinderWithHole(int nSegment, float fHeight, float fORadius, f
 
 }
 
-void Mesh::CreateColumnFrame4(
+void Mesh::CreateVerticalFrame(
 	double bodyX, double bodyY, double bodyZ,
 	double feetLength,
 	double feetHeight,
@@ -553,7 +553,7 @@ void Mesh::CreateColumnFrame4(
 	}
 }
 
-void Mesh::CreateColumnFrame2(
+void Mesh::CreateHorizontalFrame(
 	double bodyX, double bodyY, double bodyZ,
 	double feetLength,
 	double feetDistance
@@ -620,7 +620,7 @@ void Mesh::CreateColumnFrame2(
 	}
 }
 
-void Mesh::CreateCrank(
+void Mesh::CreateWheel(
 	double inR1, double inR2,
 	double outR1, double outR2,
 	int nSpoke, double spokeWidth,

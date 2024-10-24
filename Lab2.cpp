@@ -21,9 +21,9 @@ namespace Lab2 {
 	Mesh	cuboid;
 	Mesh	cylinder;
 	Mesh	cylinderWithHole;
-	Mesh	columnFrame4;
-	Mesh	columnFrame2;
-	Mesh	crank;
+	Mesh	vFrame;
+	Mesh	hFrame;
+	Mesh	wheel;
 	Mesh	slider;
 
 	int		nChoice = 1;
@@ -70,11 +70,11 @@ namespace Lab2 {
 		else if (nChoice == 5)
 			cylinderWithHole.DrawWireframe();
 		else if (nChoice == 6)
-			columnFrame4.DrawWireframe();
+			vFrame.DrawWireframe();
 		else if (nChoice == 7)
-			columnFrame2.DrawWireframe();
+			hFrame.DrawWireframe();
 		else if (nChoice == 8)
-			crank.DrawWireframe();
+			wheel.DrawWireframe();
 		else if (nChoice == 9)
 			slider.DrawWireframe();
 
@@ -92,11 +92,11 @@ namespace Lab2 {
 		else if (nChoice == 5)
 			cylinderWithHole.DrawColor();
 		else if (nChoice == 6)
-			columnFrame4.DrawColor();
+			vFrame.DrawColor();
 		else if (nChoice == 7)
-			columnFrame2.DrawColor();
+			hFrame.DrawColor();
 		else if (nChoice == 8)
-			crank.DrawColor();
+			wheel.DrawColor();
 		else if (nChoice == 9)
 			slider.DrawColor();
 
@@ -125,9 +125,9 @@ namespace Lab2 {
 		cout << "3. Cuboid" << endl;
 		cout << "4. Cylinder" << endl;
 		cout << "5. Cylinder with hole" << endl;
-		cout << "6. Column frame with four feet" << endl;
-		cout << "7. Column frame with two feet" << endl;
-		cout << "8. Crank" << endl;
+		cout << "6. Vertical frame" << endl;
+		cout << "7. Horizontal frame" << endl;
+		cout << "8. Wheel" << endl;
 		cout << "9. Slider" << endl;
 		cout << "Input the choice: " << endl;
 		cin >> nChoice;
@@ -143,9 +143,9 @@ namespace Lab2 {
 		cuboid.CreateCuboid(1, 2, 3);
 		cylinder.CreateCylinder(10, 2, 1);
 		cylinderWithHole.CreateCylinderWithHole(10, 2, 1, 0.5);
-		columnFrame4.CreateColumnFrame4(1, 2, 4, 1, 1, 2);
-		columnFrame2.CreateColumnFrame2(1, 2, 4, 1, 2);
-		crank.CreateCrank(0.2, 0.7, 3, 3.5, 5, 0.5, 1, 10);
+		vFrame.CreateVerticalFrame(1, 2, 4, 1, 1, 2);
+		hFrame.CreateHorizontalFrame(1, 2, 4, 1, 2);
+		wheel.CreateWheel(0.2, 0.7, 3, 3.5, 5, 0.5, 1, 100);
 		slider.CreateSlider(3, 4, 7, 1);
 
 		myInit();

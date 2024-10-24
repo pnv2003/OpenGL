@@ -72,18 +72,18 @@ public:
 	void CreateCylinderWithHole(int nSegment, float fHeight, float fORadius, float fIRadius);
 
 	// scotch yoke components
-	void CreateColumnFrame4(
+	void CreateVerticalFrame(
 		double bodyX, double bodyY, double bodyZ, 
 		double feetLength,
 		double feetHeight,
 		double feetDistance
 	);
-	void CreateColumnFrame2(
+	void CreateHorizontalFrame(
 		double bodyX, double bodyY, double bodyZ,
 		double feetLength,
 		double feetDistance
 	);
-	void CreateCrank(
+	void CreateWheel(
 		double inR1, double inR2,
 		double outR1, double outR2,
 		int nSpoke, double spokeWidth,
