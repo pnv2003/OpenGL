@@ -473,6 +473,153 @@ void Mesh::CreateCylinderWithHole(int nSegment, float fHeight, float fORadius, f
 
 }
 
+void Mesh::CreateCone(int nSegment, float height, float radius) {
+	int i;
+
+	numVerts = nSegment + 2;
+	pt = new Point3[numVerts];
+
+	float angle = 2 * PI / nSegment;
+	
+	pt[0].set(0, 0, height);
+	pt[1].set(0, 0, 0);
+
+	for (i = 0; i < nSegment; i++) {
+		float x = radius * cos(angle * i);
+		float y = radius * sin(angle * i);
+		pt[i + 2].set(x, y, 0);
+	}
+
+	numFaces = nSegment * 2;
+	face = new Face[numFaces];
+
+	int idx = 0;
+
+	// side faces
+	for (i = 0; i < nSegment; i++) {
+		face[idx].nVerts = 3;
+		face[idx].vert = new VertexID[face[idx].nVerts];
+
+		face[idx].vert[0].vertIndex = 0;
+		face[idx].vert[1].vertIndex = i + 2;
+		face[idx].vert[2].vertIndex = (i < nSegment - 1) ? i + 3 : 2;
+		idx++;
+	}
+
+	// bottom faces
+	for (i = 0; i < nSegment; i++) {
+		face[idx].nVerts = 3;
+		face[idx].vert = new VertexID[face[idx].nVerts];
+
+		face[idx].vert[0].vertIndex = 1;
+		face[idx].vert[1].vertIndex = (i < nSegment - 1) ? i + 3 : 2;
+		face[idx].vert[2].vertIndex = i + 2;
+		idx++;
+	}
+}
+
+void Mesh::CreateHollowCube(int nSegment, float size, float radius) {
+
+	if (nSegment % 8 != 0) {
+		throw std::runtime_error("Segment count must be divisible by 8!");
+	}
+	// note: nSegment must be divisible by 8
+	int i;
+
+	numVerts = nSegment * 4;
+	pt = new Point3[numVerts];
+
+	float angle = 2 * PI / nSegment;
+	float hTop = size / 2;
+	float hBot = -size / 2;
+
+	for (i = 0; i < nSegment; i++) {
+		float x = radius * cos(angle * i);
+		float y = radius * sin(angle * i);
+		pt[i].set(x, y, hTop);
+		pt[i + nSegment].set(x, y, hBot);
+	}
+
+	int nSideSegment = nSegment / 4;
+	float segmentSize = size / nSideSegment;
+	int idx = nSegment * 2;
+
+	float x = size / 2;
+	float y = 0;
+	// x, y is now: size/2, 0
+	for (i = 0; i < nSideSegment / 2; i++) {
+		pt[idx].set(x, y, hTop);
+		pt[idx + nSegment].set(x, y, hBot);
+		y += segmentSize;
+		idx++;
+	}
+
+	// x, y is now: size/2, size/2
+	for (i = 0; i < nSideSegment; i++) {
+		pt[idx].set(x, y, hTop);
+		pt[idx + nSegment].set(x, y, hBot);
+		x -= segmentSize;
+		idx++;
+	}
+
+	// x, y is now: -size/2, size/2
+	for (i = 0; i < nSideSegment; i++) {
+		pt[idx].set(x, y, hTop);
+		pt[idx + nSegment].set(x, y, hBot);
+		y -= segmentSize;
+		idx++;
+	}
+
+	// x, y is now: -size/2, -size/2
+	for (i = 0; i < nSideSegment; i++) {
+		pt[idx].set(x, y, hTop);
+		pt[idx + nSegment].set(x, y, hBot);
+		x += segmentSize;
+		idx++;
+	}
+
+	// x, y is now: size/2, -size/2
+	for (i = 0; i < nSideSegment / 2; i++) {
+		pt[idx].set(x, y, hTop);
+		pt[idx + nSegment].set(x, y, hBot);
+		y += segmentSize;
+		idx++;
+	}
+
+	// x, y is now: size/2, 0 (done)
+
+
+	numFaces = nSegment * 4;
+	face = new Face[numFaces];
+
+	vector<int> ptCircleTop;
+	vector<int> ptCircleBot;
+	vector<int> ptCubeTop;
+	vector<int> ptCubeBot;
+
+	for (i = 0; i < nSegment; i++) {
+		ptCircleTop.push_back(i);
+		ptCircleBot.push_back(i + nSegment);
+		ptCubeTop.push_back(i + nSegment * 2);
+		ptCubeBot.push_back(i + nSegment * 3);
+	}
+
+	vector<vector<int>> faces{};
+
+	grid(faces, ptCircleTop, ptCircleBot);
+	grid(faces, ptCircleTop, ptCubeTop);
+	grid(faces, ptCubeTop, ptCubeBot);
+	grid(faces, ptCircleBot, ptCubeBot);
+
+	for (i = 0; i < numFaces; i++) {
+		face[i].nVerts = 4;
+		face[i].vert = new VertexID[face[i].nVerts];
+		for (int j = 0; j < 4; j++) {
+			face[i].vert[j].vertIndex = faces[i][j];
+		}
+	}
+}
+
 void Mesh::CreateVerticalFrame(
 	double bodyX, double bodyY, double bodyZ,
 	double feetLength,

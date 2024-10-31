@@ -9,7 +9,8 @@ int main(int argc, char** argv) {
 	//Lab1::animatedTetrahedron();
 	//Lab1::fan();
 
-	Lab2::main(argc, argv);
+	//Lab2::main(argc, argv);
+	LabMesh::main(argc, argv);
 
 	return 0;
 }

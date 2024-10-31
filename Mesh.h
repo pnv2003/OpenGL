@@ -70,6 +70,8 @@ public:
 	void CreateCuboid(float fSizeX, float fSizeY, float fSizeZ);
 	void CreateCylinder(int nSegment, float fHeight, float fRadius);
 	void CreateCylinderWithHole(int nSegment, float fHeight, float fORadius, float fIRadius);
+	void CreateCone(int nSegment, float height, float radius);
+	void CreateHollowCube(int nSegment, float size, float radius);
 
 	// scotch yoke components
 	void CreateVerticalFrame(

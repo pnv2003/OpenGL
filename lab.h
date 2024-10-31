@@ -18,4 +18,8 @@ namespace Lab2 {
 	int main(int argc, char* argv[]);
 }
 
+namespace LabMesh {
+	int main(int argc, char* argv[]);
+}
+
 #endif
