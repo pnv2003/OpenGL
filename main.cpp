@@ -11,7 +11,8 @@ int main(int argc, char** argv) {
 
 	//Lab2::main(argc, argv);
 	//LabMesh::main(argc, argv);
-	LabTransformation::main2(argc, argv);
+	//LabTransformation::Exercise2::main();
+	LabCamera::main1(argc, argv);
 
 	return 0;
 }
