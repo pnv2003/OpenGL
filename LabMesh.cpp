@@ -114,7 +114,7 @@ namespace LabMesh {
 	}
 
 
-	int main(int argc, char* argv[])
+	int main()
 	{
 		cout << "Press -> or <- to rotate" << endl;
 

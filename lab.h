@@ -33,9 +33,18 @@ namespace LabTransformation {
 }
 
 namespace LabCamera {
-	int main1(int argc, char* argv[]);
-	int main2(int argc, char* argv[]);
-	int main3(int argc, char* argv[]);
+
+	namespace Exercise1 {
+		int main(int argc, char* argv[]);
+	}
+
+	namespace Exercise2 {
+		int main(int argc, char* argv[]);
+	}
+
+	namespace Exercise3 {
+		int main(int argc, char* argv[]);
+	}
 }
 
 #endif

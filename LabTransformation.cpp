@@ -106,7 +106,7 @@ namespace LabTransformation {
 			glFlush();
 		}
 
-		int main(int argc, char* argv[]) {
+		int main() {
 			//glutInit(&argc, (char**)argv); //initialize the tool kit
 			glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB); //set the display mode
 			glutInitWindowSize(650, 650); //set window size
@@ -345,7 +345,7 @@ namespace LabTransformation {
 			glutPostRedisplay();
 		}
 
-		int main(int argc, char* argv[]) {
+		int main() {
 			cout << "0. Original" << endl;
 			cout << "1. Problem 1" << endl;
 			cout << "2. Problem 2" << endl;
