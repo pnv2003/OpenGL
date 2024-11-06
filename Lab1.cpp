@@ -6,7 +6,6 @@ using namespace std;
 namespace Lab1 {
 	//-----------------------------------------------------
 	void square() {
-		glutInit(&argc, argv);
 		glutCreateWindow("square");
 		glutDisplayFunc([]() {
 			glClear(GL_COLOR_BUFFER_BIT);
