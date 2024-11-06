@@ -10,7 +10,8 @@ int main(int argc, char** argv) {
 	//Lab1::fan();
 
 	//Lab2::main(argc, argv);
-	LabMesh::main(argc, argv);
+	//LabMesh::main(argc, argv);
+	LabTransformation::main2(argc, argv);
 
 	return 0;
 }

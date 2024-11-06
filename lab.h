@@ -22,4 +22,9 @@ namespace LabMesh {
 	int main(int argc, char* argv[]);
 }
 
+namespace LabTransformation {
+	int main1(int argc, char* argv[]);
+	int main2(int argc, char* argv[]);
+}
+
 #endif
