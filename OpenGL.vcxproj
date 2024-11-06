@@ -133,6 +133,7 @@
   <ItemGroup>
     <ClCompile Include="Lab1.cpp" />
     <ClCompile Include="Lab2.cpp" />
+    <ClCompile Include="LabCamera.cpp" />
     <ClCompile Include="LabMesh.cpp" />
     <ClCompile Include="LabTransformation.cpp" />
     <ClCompile Include="main.cpp" />
