@@ -15,35 +15,35 @@ namespace Lab1 {
 }
 
 namespace Lab2 {
-	int main(int argc, char* argv[]);
+	int main();
 }
 
 namespace LabMesh {
-	int main(int argc, char* argv[]);
+	int main();
 }
 
 namespace LabTransformation {
 	namespace Exercise1 {
-		int main(int argc, char* argv[]);
+		int main();
 	}
 
 	namespace Exercise2 {
-		int main(int argc, char* argv[]);
+		int main();
 	}
 }
 
 namespace LabCamera {
 
 	namespace Exercise1 {
-		int main(int argc, char* argv[]);
+		int main();
 	}
 
 	namespace Exercise2 {
-		int main(int argc, char* argv[]);
+		int main();
 	}
 
 	namespace Exercise3 {
-		int main(int argc, char* argv[]);
+		int main();
 	}
 }
 
