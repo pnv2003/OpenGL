@@ -134,6 +134,7 @@
     <ClCompile Include="Lab1.cpp" />
     <ClCompile Include="Lab2.cpp" />
     <ClCompile Include="LabCamera.cpp" />
+    <ClCompile Include="LabLighting.cpp" />
     <ClCompile Include="LabMesh.cpp" />
     <ClCompile Include="LabTransformation.cpp" />
     <ClCompile Include="main.cpp" />
@@ -144,7 +145,6 @@
     <ClInclude Include="lab.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="supportClass.h" />
-    <ClInclude Include="util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

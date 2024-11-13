@@ -47,4 +47,24 @@ namespace LabCamera {
 	}
 }
 
+namespace LabLighting {
+	namespace Exercise1 {
+		int main();
+	}
+
+	namespace Exercise2 {
+		int main();
+	}
+
+	namespace Exercise3 {
+		int main();
+	}
+
+	namespace Exercise4 {
+		int main();
+	}
+}
+
+
+
 #endif
