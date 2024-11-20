@@ -65,6 +65,10 @@ namespace LabLighting {
 	}
 }
 
+namespace Assignment {
+	int main();
+}
+
 
 
 #endif

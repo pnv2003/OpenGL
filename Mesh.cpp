@@ -81,6 +81,16 @@ void Mesh::DrawColor()
 	}
 }
 
+void Mesh::SetColor(int colorIdx) {
+	for (int f = 0; f < numFaces; f++)
+	{
+		for (int v = 0; v < face[f].nVerts; v++)
+		{
+			face[f].vert[v].colorIndex = colorIdx;
+		}
+	}
+}
+
 void Mesh::CreateTetrahedron()
 {
 	int i;
@@ -481,13 +491,13 @@ void Mesh::CreateCone(int nSegment, float height, float radius) {
 
 	float angle = 2 * PI / nSegment;
 	
-	pt[0].set(0, 0, height);
+	pt[0].set(0, height, 0);
 	pt[1].set(0, 0, 0);
 
 	for (i = 0; i < nSegment; i++) {
 		float x = radius * cos(angle * i);
 		float y = radius * sin(angle * i);
-		pt[i + 2].set(x, y, 0);
+		pt[i + 2].set(y, 0, x);
 	}
 
 	numFaces = nSegment * 2;
@@ -536,8 +546,8 @@ void Mesh::CreateHollowCube(int nSegment, float size, float radius) {
 	for (i = 0; i < nSegment; i++) {
 		float x = radius * cos(angle * i);
 		float y = radius * sin(angle * i);
-		pt[i].set(x, y, hTop);
-		pt[i + nSegment].set(x, y, hBot);
+		pt[i].set(y, hTop, x);
+		pt[i + nSegment].set(y, hBot, x);
 	}
 
 	int nSideSegment = nSegment / 4;
@@ -548,40 +558,40 @@ void Mesh::CreateHollowCube(int nSegment, float size, float radius) {
 	float y = 0;
 	// x, y is now: size/2, 0
 	for (i = 0; i < nSideSegment / 2; i++) {
-		pt[idx].set(x, y, hTop);
-		pt[idx + nSegment].set(x, y, hBot);
+		pt[idx].set(y, hTop, x);
+		pt[idx + nSegment].set(y, hBot, x);
 		y += segmentSize;
 		idx++;
 	}
 
 	// x, y is now: size/2, size/2
 	for (i = 0; i < nSideSegment; i++) {
-		pt[idx].set(x, y, hTop);
-		pt[idx + nSegment].set(x, y, hBot);
+		pt[idx].set(y, hTop, x);
+		pt[idx + nSegment].set(y, hBot, x);
 		x -= segmentSize;
 		idx++;
 	}
 
 	// x, y is now: -size/2, size/2
 	for (i = 0; i < nSideSegment; i++) {
-		pt[idx].set(x, y, hTop);
-		pt[idx + nSegment].set(x, y, hBot);
+		pt[idx].set(y, hTop, x);
+		pt[idx + nSegment].set(y, hBot, x);
 		y -= segmentSize;
 		idx++;
 	}
 
 	// x, y is now: -size/2, -size/2
 	for (i = 0; i < nSideSegment; i++) {
-		pt[idx].set(x, y, hTop);
-		pt[idx + nSegment].set(x, y, hBot);
+		pt[idx].set(y, hTop, x);
+		pt[idx + nSegment].set(y, hBot, x);
 		x += segmentSize;
 		idx++;
 	}
 
 	// x, y is now: size/2, -size/2
 	for (i = 0; i < nSideSegment / 2; i++) {
-		pt[idx].set(x, y, hTop);
-		pt[idx + nSegment].set(x, y, hBot);
+		pt[idx].set(y, hTop, x);
+		pt[idx + nSegment].set(y, hBot, x);
 		y += segmentSize;
 		idx++;
 	}
@@ -635,32 +645,32 @@ void Mesh::CreateVerticalFrame(
 	double bodyX2 = bodyX / 2;
 	double bodyY2 = bodyY / 2;
 	double feetX2 = (bodyX + feetLength) / 2;
-	double feetY2 = (bodyY + feetHeight) / 2;
+	double feetY2 = (bodyY + feetLength) / 2;
 
 	double hTop = hTotal / 2;
 	double hMid1 = -hTotal / 2 + feetHeight + feetDistance;
 	double hMid2 = -hTotal / 2 + feetHeight;
 	double hBot = -hTotal / 2;
 
-	pt[0].set(bodyX2, -bodyY2, hTop);
-	pt[1].set(-bodyX2, -bodyY2, hTop);
-	pt[2].set(-bodyX2, bodyY2, hTop);
-	pt[3].set(bodyX2, bodyY2, hTop);
+    pt[0].set(-bodyY2, hTop, bodyX2);
+    pt[1].set(-bodyY2, hTop, -bodyX2);
+    pt[2].set(bodyY2, hTop, -bodyX2);
+    pt[3].set(bodyY2, hTop, bodyX2);
 
-	pt[4].set(bodyX2, -bodyY2, hMid1);
-	pt[5].set(-bodyX2, -bodyY2, hMid1);
-	pt[6].set(-bodyX2, bodyY2, hMid1);
-	pt[7].set(bodyX2, bodyY2, hMid1);
+    pt[4].set(-bodyY2, hMid1, bodyX2);
+    pt[5].set(-bodyY2, hMid1, -bodyX2);
+    pt[6].set(bodyY2, hMid1, -bodyX2);
+    pt[7].set(bodyY2, hMid1, bodyX2);
 
-	pt[8].set(feetX2, -feetY2, hMid2);
-	pt[9].set(-feetX2, -feetY2, hMid2);
-	pt[10].set(-feetX2, feetY2, hMid2);
-	pt[11].set(feetX2, feetY2, hMid2);
+    pt[8].set(-feetY2, hMid2, feetX2);
+    pt[9].set(-feetY2, hMid2, -feetX2);
+    pt[10].set(feetY2, hMid2, -feetX2);
+    pt[11].set(feetY2, hMid2, feetX2);
 
-	pt[12].set(feetX2, -feetY2, hBot);
-	pt[13].set(-feetX2, -feetY2, hBot);
-	pt[14].set(-feetX2, feetY2, hBot);
-	pt[15].set(feetX2, feetY2, hBot);
+    pt[12].set(-feetY2, hBot, feetX2);
+    pt[13].set(-feetY2, hBot, -feetX2);
+    pt[14].set(feetY2, hBot, -feetX2);
+    pt[15].set(feetY2, hBot, feetX2);
 
 	numFaces = 14;
 	face = new Face[numFaces];
@@ -713,27 +723,27 @@ void Mesh::CreateHorizontalFrame(
 	double hTotal = bodyZ + feetDistance;
 	double bodyX2 = bodyX / 2;
 	double bodyY2 = bodyY / 2;
-	double feetX2 = (bodyX + feetLength) / 2;
+	double feetX2 = bodyX / 2;
 	double feetY2 = (bodyY + feetLength) / 2;
 
 	double hTop = hTotal / 2;
 	double hMid = -hTotal / 2 + feetDistance;
 	double hBot = -hTotal / 2;
 
-	pt[0].set(bodyX2, -bodyY2, hTop);
-	pt[1].set(-bodyX2, -bodyY2, hTop);
-	pt[2].set(-bodyX2, bodyY2, hTop);
-	pt[3].set(bodyX2, bodyY2, hTop);
+    pt[0].set(-bodyY2, hTop, bodyX2);
+    pt[1].set(-bodyY2, hTop, -bodyX2);
+    pt[2].set(bodyY2, hTop, -bodyX2);
+    pt[3].set(bodyY2, hTop, bodyX2);
 
-	pt[4].set(bodyX2, -bodyY2, hMid);
-	pt[5].set(-bodyX2, -bodyY2, hMid);
-	pt[6].set(-bodyX2, bodyY2, hMid);
-	pt[7].set(bodyX2, bodyY2, hMid);
+    pt[4].set(-bodyY2, hMid, bodyX2);
+    pt[5].set(-bodyY2, hMid, -bodyX2);
+    pt[6].set(bodyY2, hMid, -bodyX2);
+    pt[7].set(bodyY2, hMid, bodyX2);
 
-	pt[8].set(feetX2, -feetY2, hBot);
-	pt[9].set(-feetX2, -feetY2, hBot);
-	pt[10].set(-feetX2, feetY2, hBot);
-	pt[11].set(feetX2, feetY2, hBot);
+    pt[8].set(-feetY2, hBot, feetX2);
+    pt[9].set(-feetY2, hBot, -feetX2);
+    pt[10].set(feetY2, hBot, -feetX2);
+    pt[11].set(feetY2, hBot, feetX2);
 
 	numFaces = 10;
 	face = new Face[numFaces];
@@ -936,27 +946,27 @@ void Mesh::CreateSlider(
 	double xOut = x / 2;
 	double yOut = y / 2;
 	double xIn = x / 2;
-	double yIn = (y - thickness) / 2;
+	double yIn = (y - thickness * 2) / 2;
 
-	pt[0].set(xOut, -yOut, hTop1);
-	pt[1].set(-xOut, -yOut, hTop1);
-	pt[2].set(-xOut, yOut, hTop1);
-	pt[3].set(xOut, yOut, hTop1);
+    pt[0].set(-yOut, hTop1, xOut);
+    pt[1].set(-yOut, hTop1, -xOut);
+    pt[2].set(yOut, hTop1, -xOut);
+    pt[3].set(yOut, hTop1, xOut);
 
-	pt[4].set(xIn, -yIn, hTop2);
-	pt[5].set(-xIn, -yIn, hTop2);
-	pt[6].set(-xIn, yIn, hTop2);
-	pt[7].set(xIn, yIn, hTop2);
+    pt[4].set(-yIn, hTop2, xIn);
+    pt[5].set(-yIn, hTop2, -xIn);
+    pt[6].set(yIn, hTop2, -xIn);
+    pt[7].set(yIn, hTop2, xIn);
 
-	pt[8].set(xIn, -yIn, hBot2);
-	pt[9].set(-xIn, -yIn, hBot2);
-	pt[10].set(-xIn, yIn, hBot2);
-	pt[11].set(xIn, yIn, hBot2);
+    pt[8].set(-yIn, hBot2, xIn);
+    pt[9].set(-yIn, hBot2, -xIn);
+    pt[10].set(yIn, hBot2, -xIn);
+    pt[11].set(yIn, hBot2, xIn);
 
-	pt[12].set(xOut, -yOut, hBot1);
-	pt[13].set(-xOut, -yOut, hBot1);
-	pt[14].set(-xOut, yOut, hBot1);
-	pt[15].set(xOut, yOut, hBot1);
+    pt[12].set(-yOut, hBot1, xOut);
+    pt[13].set(-yOut, hBot1, -xOut);
+    pt[14].set(yOut, hBot1, -xOut);
+    pt[15].set(yOut, hBot1, xOut);
 
 	numFaces = 16;
 	face = new Face[numFaces];

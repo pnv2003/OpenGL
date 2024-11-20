@@ -12,8 +12,9 @@ int main(int argc, char** argv) {
 	//Lab2::main();
 	//LabMesh::main();
 	//LabTransformation::Exercise2::main();
-	//LabCamera::Exercise1::main();
-	LabLighting::Exercise1::main();
+	//LabCamera::Exercise3::main();
+	//LabLighting::Exercise1::main();
+	Assignment::main();
 	
 	return 0;
 }

@@ -64,6 +64,7 @@ public:
 	}
 	void DrawWireframe();
 	void DrawColor();
+	void SetColor(int colorIdx);
 
 	void CreateTetrahedron();
 	void CreateCube(float	fSize);
