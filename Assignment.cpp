@@ -31,7 +31,7 @@ namespace Assignment {
 	float camera_dis;
 	float camera_X, camera_Y, camera_Z;
 	float lookAt_X, lookAt_Y, lookAt_Z;
-	bool color = false;
+	bool color_mode = false;
 
 	float CAMERA_SPEED = 5;
 
@@ -39,6 +39,7 @@ namespace Assignment {
 	GLfloat BASE_H = 0.5;
 	GLfloat BASE_L = 7;
 	GLfloat BASE_W = 2;
+	int BASE_COLOR = 14;
 
 	GLfloat VFRAME_FOOT_H = 0.3;
 	GLfloat VFRAME_FOOT_L = 0.5;
@@ -46,12 +47,14 @@ namespace Assignment {
 	GLfloat VFRAME_BODY_H = 5;
 	GLfloat VFRAME_BODY_L = 1;
 	GLfloat VFRAME_BODY_W = 0.75;
+	int VFRAME_COLOR = 15;
 
 	GLfloat HFRAME_BODY_H = 4;
 	GLfloat HFRAME_BODY_L = 0.75;
 	GLfloat HFRAME_BODY_W = 1;
 	GLfloat HFRAME_KNEE_H = BASE_L * 3 / 4 - VFRAME_BODY_L / 2 - HFRAME_BODY_H;
 	GLfloat HFRAME_FOOT_L = 0.5;
+	int HFRAME_COLOR = 15;
 
 	GLfloat WHEEL_RADIUS_CENTER_INNER = 0.5;
 	GLfloat WHEEL_RADIUS_CENTER_OUTER = 1;
@@ -60,20 +63,26 @@ namespace Assignment {
 	GLfloat WHEEL_NSPOKE = 5;
 	GLfloat WHEEL_WSPOKE = 1;
 	GLfloat WHEEL_THICKNESS = 0.5;
+	int WHEEL_COLOR = 18;
 
 	GLfloat PIN_RADIUS = 0.1;
 	GLfloat PIN_HEIGHT = 0.5;
+	int PIN_COLOR = 15;
+	int CENTER_COLOR = 17;
 
 	GLfloat SLIDER_H = 6;
 	GLfloat SLIDER_L = 0.5;
 	GLfloat SLIDER_THICKNESS = 0.2;
 	GLfloat SLIDER_W = SLIDER_THICKNESS * 2 + PIN_RADIUS * 2;
+	int SLIDER_COLOR = 19;
 
 	GLfloat ROD_RADIUS = 0.2;
 	GLfloat ROD_LENGTH = 8;
+	int ROD_COLOR = 19;
 
 	GLfloat HOLDER_RADIUS = ROD_RADIUS;
 	GLfloat HOLDER_SIZE = 0.75;
+	int HOLDER_COLOR = 16;
 
 	void mySetupCameraVolume()
 	{
@@ -129,7 +138,7 @@ namespace Assignment {
 			break;
 		case 'W':
 		case 'w': 
-			color = !color;
+			color_mode = !color_mode;
 			break;
 		}
 		glutPostRedisplay();
@@ -170,10 +179,13 @@ namespace Assignment {
 		glVertex3f(0, 0, 4);
 		glEnd();
 	}
-	void drawShape(Mesh& mesh)
+	void drawShape(Mesh& mesh, int colorIdx = -1)
 	{
-		if (color)
+		if (color_mode && colorIdx >= 0)
+		{
+			mesh.SetColor(colorIdx);
 			mesh.DrawColor();
+		}
 		else
 			mesh.DrawWireframe();
 	}
@@ -197,7 +209,7 @@ namespace Assignment {
 		glPushMatrix();
 		base.CreateCuboid(BASE_L, BASE_H, BASE_W);
 		glTranslatef(0, BASE_H, 0);
-		drawShape(base);
+		drawShape(base, BASE_COLOR);
 		glPopMatrix();
 
 		//--------------------------------------------------------------------------------
@@ -217,7 +229,7 @@ namespace Assignment {
 			(VFRAME_BODY_H + VFRAME_FOOT_H + VFRAME_KNEE_H) / 2 + BASE_H * 2,
 			0
 		);
-		drawShape(vFrameLeft);
+		drawShape(vFrameLeft, VFRAME_COLOR);
 		glPopMatrix();
 
 		glPushMatrix();
@@ -235,7 +247,7 @@ namespace Assignment {
 			(VFRAME_BODY_H + VFRAME_FOOT_H + VFRAME_KNEE_H) / 2 + BASE_H * 2,
 			0
 		);
-		drawShape(vFrameRight);
+		drawShape(vFrameRight, VFRAME_COLOR);
 		glPopMatrix();
 
 		//--------------------------------------------------------------------------------
@@ -250,7 +262,7 @@ namespace Assignment {
 			VFRAME_BODY_W / 2 + WHEEL_THICKNESS + HOLDER_SIZE / 2
 		);
 		glRotatef(90, 0, 0, 1);
-		drawShape(holderLeft);
+		drawShape(holderLeft, HOLDER_COLOR);
 		glPopMatrix();
 
 		glPushMatrix();
@@ -262,7 +274,7 @@ namespace Assignment {
 			VFRAME_BODY_W / 2 + WHEEL_THICKNESS + HOLDER_SIZE / 2
 		);
 		glRotatef(90, 0, 0, 1);
-		drawShape(holderRight);
+		drawShape(holderRight, HOLDER_COLOR);
 		glPopMatrix();
 
 		//--------------------------------------------------------------------------------
@@ -276,7 +288,7 @@ namespace Assignment {
 			BASE_H * 2 + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2,
 			VFRAME_BODY_W / 2 + WHEEL_THICKNESS / 2
 		);
-		drawShape(holderPadLeft);
+		drawShape(holderPadLeft, HOLDER_COLOR);
 		glPopMatrix();
 
 		glPushMatrix();
@@ -287,7 +299,7 @@ namespace Assignment {
 			BASE_H * 2 + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2,
 			VFRAME_BODY_W / 2 + WHEEL_THICKNESS / 2
 		);
-		drawShape(holderPadRight);
+		drawShape(holderPadRight, HOLDER_COLOR);
 		glPopMatrix();
 		
 		//--------------------------------------------------------------------------------
@@ -307,7 +319,7 @@ namespace Assignment {
 			0
 		);
 		glRotatef(-90, 0, 0, 1);
-		drawShape(hFrameLeft);
+		drawShape(hFrameLeft, HFRAME_COLOR);
 		glPopMatrix();
 
 		glPushMatrix();
@@ -325,7 +337,7 @@ namespace Assignment {
 			0
 		);
 		glRotatef(90, 0, 0, 1);
-		drawShape(hFrameRight);
+		drawShape(hFrameRight, HFRAME_COLOR);
 		glPopMatrix();
 
 		//--------------------------------------------------------------------------------
@@ -341,7 +353,7 @@ namespace Assignment {
 		);
 		// make the center vertical
 		glRotatef(90, 1, 0, 0);
-		drawShape(center);
+		drawShape(center, CENTER_COLOR);
 		glPopMatrix();
 
 		//--------------------------------------------------------------------------------
@@ -364,7 +376,7 @@ namespace Assignment {
 			BASE_H * 2 + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2,
 			HFRAME_BODY_L
 		);
-		drawShape(wheel);
+		drawShape(wheel, WHEEL_COLOR);
 		glPopMatrix();
 
 		//--------------------------------------------------------------------------------
@@ -380,7 +392,7 @@ namespace Assignment {
 		);
 		// make the pin horizontal
 		glRotatef(90, 1, 0, 0);
-		drawShape(pin);
+		drawShape(pin, PIN_COLOR);
 		glPopMatrix();
 
 		//--------------------------------------------------------------------------------
@@ -400,7 +412,7 @@ namespace Assignment {
 			BASE_H * 2 + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2,
 			HFRAME_BODY_L + WHEEL_THICKNESS / 2 + SLIDER_L / 2
 		);
-		drawShape(slider);
+		drawShape(slider, SLIDER_COLOR);
 		glPopMatrix();
 
 		//--------------------------------------------------------------------------------
@@ -416,7 +428,7 @@ namespace Assignment {
 		);
 		// make the rod horizontal
 		glRotatef(90, 0, 0, 1);
-		drawShape(rodLeft);
+		drawShape(rodLeft, ROD_COLOR);
 		glPopMatrix();
 
 		glPushMatrix();
@@ -429,7 +441,7 @@ namespace Assignment {
 		);
 		// make the rod horizontal
 		glRotatef(90, 0, 0, 1);
-		drawShape(rodRight);
+		drawShape(rodRight, ROD_COLOR);
 		glPopMatrix();
 
 		glFlush();

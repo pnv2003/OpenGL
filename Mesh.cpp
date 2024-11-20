@@ -7,14 +7,33 @@ using namespace std;
 
 #define PI			3.1415926
 #define DEG2RAD		(3.14159/180.0)
-#define	COLORNUM	14
+#define	COLORNUM	20
 
 
-float	ColorArr[COLORNUM][3] = { {1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, { 0.0,  0.0, 1.0},
-								{1.0, 1.0,  0.0}, { 1.0, 0.0, 1.0},{ 0.0, 1.0, 1.0},
-								 {0.3, 0.3, 0.3}, {0.5, 0.5, 0.5}, { 0.9,  0.9, 0.9},
-								{1.0, 0.5,  0.5}, { 0.5, 1.0, 0.5},{ 0.5, 0.5, 1.0},
-								{0.0, 0.0, 0.0}, {1.0, 1.0, 1.0} };
+float	ColorArr[COLORNUM][3] = { 
+	{1.0, 0.0, 0.0}, // 0.  red
+	{0.0, 1.0, 0.0}, // 1.  green
+	{0.0, 0.0, 1.0}, // 2.  blue
+	{1.0, 1.0, 0.0}, // 3.  yellow
+	{1.0, 0.0, 1.0}, // 4.  purple
+	{0.0, 1.0, 1.0}, // 5.  cyan
+	{0.3, 0.3, 0.3}, // 6.  gray (dark)
+	{0.5, 0.5, 0.5}, // 7.  gray (medium)
+	{0.9, 0.9, 0.9}, // 8.  gray (light)
+	{1.0, 0.5, 0.5}, // 9.  pink
+	{0.5, 1.0, 0.5}, // 10. light green
+	{0.5, 0.5, 1.0}, // 11. light blue
+	{0.0, 0.0, 0.0}, // 12. black
+	{1.0, 1.0, 1.0}, // 13. white
+
+	// extra colors
+	{231.0 / 255, 141.0 / 255, 96.0 / 255}, // 14. brown
+	{231.0 / 255, 51.0 / 255, 51.0 / 255}, // 15. red
+	{141.0 / 255, 51.0 / 255, 51.0 / 255}, // 16. dark red
+	{87.0 / 255, 87.0 / 255, 87.0 / 255}, // 17. dark gray
+	{51.0 / 255, 51.0 / 255, 231.0 / 255}, // 18. blue
+	{51.0 / 255, 231.0 / 255, 51.0 / 255} // 19. green
+};
 	
 void grid(vector<vector<int>>& lad, const vector<int>& v1, const vector<int>& v2) {
 	if (v1.size() != v2.size())
@@ -47,6 +66,7 @@ void ladder(vector<vector<int>>& lad, const vector<int>& v1, const vector<int>& 
 
 void Mesh::DrawWireframe()
 {
+	glColor3f(0, 0, 0);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	for (int f = 0; f < numFaces; f++)
 	{
@@ -72,7 +92,7 @@ void Mesh::DrawColor()
 			int		iv = face[f].vert[v].vertIndex;
 			int		ic = face[f].vert[v].colorIndex;
 
-			ic = f % COLORNUM;
+			ic = ic % COLORNUM;
 
 			glColor3f(ColorArr[ic][0], ColorArr[ic][1], ColorArr[ic][2]);
 			glVertex3f(pt[iv].x, pt[iv].y, pt[iv].z);
@@ -86,7 +106,7 @@ void Mesh::SetColor(int colorIdx) {
 	{
 		for (int v = 0; v < face[f].nVerts; v++)
 		{
-			face[f].vert[v].colorIndex = colorIdx;
+			this->face[f].vert[v].colorIndex = colorIdx;
 		}
 	}
 }
