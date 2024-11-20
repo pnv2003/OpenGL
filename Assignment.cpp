@@ -34,6 +34,7 @@ namespace Assignment {
 	bool color_mode = false;
 
 	float CAMERA_SPEED = 5;
+	float WHEEL_SPEED = 5;
 
 	// model parameters
 	GLfloat BASE_H = 0.5;
@@ -83,6 +84,10 @@ namespace Assignment {
 	GLfloat HOLDER_RADIUS = ROD_RADIUS;
 	GLfloat HOLDER_SIZE = 0.75;
 	int HOLDER_COLOR = 1;// 16;
+
+	// state variables
+	GLfloat pin_angle = 270;
+	GLfloat PIN_CENTER_DIST = WHEEL_RADIUS_BORDER_INNER + (WHEEL_RADIUS_BORDER_OUTER - WHEEL_RADIUS_BORDER_INNER) / 2;
 
 	void mySetupCameraVolume()
 	{
@@ -139,6 +144,12 @@ namespace Assignment {
 		case 'W':
 		case 'w': 
 			color_mode = !color_mode;
+			break;
+		case '1':
+			pin_angle += WHEEL_SPEED;
+			break;
+		case '2':
+			pin_angle -= WHEEL_SPEED;
 			break;
 		}
 		glutPostRedisplay();
@@ -376,6 +387,8 @@ namespace Assignment {
 			BASE_H * 2 + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2,
 			HFRAME_BODY_L
 		);
+		glRotatef(pin_angle - 270, 0, 0, 1);
+		glRotatef(90, 1, 0, 0);
 		drawShape(wheel, WHEEL_COLOR);
 		glPopMatrix();
 
@@ -390,7 +403,9 @@ namespace Assignment {
 			BASE_H * 2 + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2 - WHEEL_RADIUS_BORDER_INNER - (WHEEL_RADIUS_BORDER_OUTER - WHEEL_RADIUS_BORDER_INNER) / 2,
 			HFRAME_BODY_L + PIN_HEIGHT / 2 + WHEEL_THICKNESS / 2
 		);
-		// make the pin horizontal
+		glTranslatef(0, PIN_CENTER_DIST, 0);
+		glRotatef(pin_angle - 270, 0, 0, 1);
+		glTranslatef(0, -PIN_CENTER_DIST, 0);
 		glRotatef(90, 1, 0, 0);
 		drawShape(pin, PIN_COLOR);
 		glPopMatrix();
@@ -408,7 +423,7 @@ namespace Assignment {
 
 		// put the slider on the pin
 		glTranslatef(
-			0,
+			PIN_CENTER_DIST * cos(DEG2RAD(pin_angle)),
 			BASE_H * 2 + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2,
 			HFRAME_BODY_L + WHEEL_THICKNESS / 2 + SLIDER_L / 2
 		);
@@ -422,7 +437,7 @@ namespace Assignment {
 		rodLeft.CreateCylinder(10, ROD_LENGTH, ROD_RADIUS);
 		// put the rod on the slider, through the holder
 		glTranslatef(
-			-ROD_LENGTH / 2 - SLIDER_W / 2,
+			-ROD_LENGTH / 2 - SLIDER_W / 2 + PIN_CENTER_DIST * cos(DEG2RAD(pin_angle)),
 			BASE_H * 2 + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2,
 			VFRAME_BODY_W / 2 + WHEEL_THICKNESS + HOLDER_SIZE / 2
 		);
@@ -435,7 +450,7 @@ namespace Assignment {
 		rodRight.CreateCylinder(10, ROD_LENGTH, ROD_RADIUS);
 		// put the rod on the slider, through the holder
 		glTranslatef(
-			ROD_LENGTH / 2 + SLIDER_W / 2,
+			ROD_LENGTH / 2 + SLIDER_W / 2 + PIN_CENTER_DIST * cos(DEG2RAD(pin_angle)),
 			BASE_H * 2 + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2,
 			VFRAME_BODY_W / 2 + WHEEL_THICKNESS + HOLDER_SIZE / 2
 		);

@@ -832,10 +832,10 @@ void Mesh::CreateWheel(
 			x = radius * cos(angle * i);
 			y = radius * sin(angle * i);
 			z = hTop;
-			pt[idx + i].set(x, y, z);
+			pt[idx + i].set(y, z, x);
 
 			z = hBot;
-			pt[idx + i + nSegment].set(x, y, z);
+			pt[idx + i + nSegment].set(y, z, x);
 		}
 	}
 
@@ -858,16 +858,16 @@ void Mesh::CreateWheel(
 			x = radius * cos(angle * s - theta);
 			y = radius * sin(angle * s - theta);
 			z = hTop;
-			pt[idx + s*2].set(x, y, z);
+			pt[idx + s*2].set(y, z, x);
 			z = hBot;
-			pt[idx + s*2 + nSpoke*2].set(x, y, z);
+			pt[idx + s*2 + nSpoke*2].set(y, z, x);
 
 			x = radius * cos(angle * s + theta);
 			y = radius * sin(angle * s + theta);
 			z = hTop;
-			pt[idx + s*2 + 1].set(x, y, z);
+			pt[idx + s*2 + 1].set(y, z, x);
 			z = hBot;
-			pt[idx + s*2 + nSpoke*2 + 1].set(x, y, z);
+			pt[idx + s*2 + nSpoke*2 + 1].set(y, z, x);
 		}
 	}
 
