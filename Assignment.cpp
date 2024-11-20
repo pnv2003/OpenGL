@@ -31,6 +31,7 @@ namespace Assignment {
 	float camera_dis;
 	float camera_X, camera_Y, camera_Z;
 	float lookAt_X, lookAt_Y, lookAt_Z;
+	bool color = false;
 
 	float CAMERA_SPEED = 5;
 
@@ -118,7 +119,6 @@ namespace Assignment {
 	{
 		switch (key)
 		{
-			//Code here
 		case '+':
 			camera_dis += 0.1 * CAMERA_SPEED;
 			changeCameraPos();
@@ -126,6 +126,10 @@ namespace Assignment {
 		case '-':
 			camera_dis -= 0.1 * CAMERA_SPEED;
 			changeCameraPos();
+			break;
+		case 'W':
+		case 'w': 
+			color = !color;
 			break;
 		}
 		glutPostRedisplay();
@@ -166,6 +170,13 @@ namespace Assignment {
 		glVertex3f(0, 0, 4);
 		glEnd();
 	}
+	void drawShape(Mesh& mesh)
+	{
+		if (color)
+			mesh.DrawColor();
+		else
+			mesh.DrawWireframe();
+	}
 	void myDisplay()
 	{
 		mySetupCameraVolume();
@@ -186,8 +197,7 @@ namespace Assignment {
 		glPushMatrix();
 		base.CreateCuboid(BASE_L, BASE_H, BASE_W);
 		glTranslatef(0, BASE_H, 0);
-		base.DrawWireframe();
-		//base.DrawColor();
+		drawShape(base);
 		glPopMatrix();
 
 		//--------------------------------------------------------------------------------
@@ -207,8 +217,7 @@ namespace Assignment {
 			(VFRAME_BODY_H + VFRAME_FOOT_H + VFRAME_KNEE_H) / 2 + BASE_H * 2,
 			0
 		);
-		vFrameLeft.DrawWireframe();
-		//vFrameLeft.DrawColor();
+		drawShape(vFrameLeft);
 		glPopMatrix();
 
 		glPushMatrix();
@@ -226,8 +235,7 @@ namespace Assignment {
 			(VFRAME_BODY_H + VFRAME_FOOT_H + VFRAME_KNEE_H) / 2 + BASE_H * 2,
 			0
 		);
-		vFrameRight.DrawWireframe();
-		//vFrameRight.DrawColor();
+		drawShape(vFrameRight);
 		glPopMatrix();
 
 		//--------------------------------------------------------------------------------
@@ -242,8 +250,7 @@ namespace Assignment {
 			VFRAME_BODY_W / 2 + WHEEL_THICKNESS + HOLDER_SIZE / 2
 		);
 		glRotatef(90, 0, 0, 1);
-		holderLeft.DrawWireframe();
-		//holderLeft.DrawColor();
+		drawShape(holderLeft);
 		glPopMatrix();
 
 		glPushMatrix();
@@ -255,8 +262,7 @@ namespace Assignment {
 			VFRAME_BODY_W / 2 + WHEEL_THICKNESS + HOLDER_SIZE / 2
 		);
 		glRotatef(90, 0, 0, 1);
-		holderRight.DrawWireframe();
-		//holderRight.DrawColor();
+		drawShape(holderRight);
 		glPopMatrix();
 
 		//--------------------------------------------------------------------------------
@@ -270,8 +276,7 @@ namespace Assignment {
 			BASE_H * 2 + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2,
 			VFRAME_BODY_W / 2 + WHEEL_THICKNESS / 2
 		);
-		holderPadLeft.DrawWireframe();
-		//holderPadLeft.DrawColor();
+		drawShape(holderPadLeft);
 		glPopMatrix();
 
 		glPushMatrix();
@@ -282,8 +287,7 @@ namespace Assignment {
 			BASE_H * 2 + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2,
 			VFRAME_BODY_W / 2 + WHEEL_THICKNESS / 2
 		);
-		holderPadRight.DrawWireframe();
-		//holderPadRight.DrawColor();
+		drawShape(holderPadRight);
 		glPopMatrix();
 		
 		//--------------------------------------------------------------------------------
@@ -303,8 +307,7 @@ namespace Assignment {
 			0
 		);
 		glRotatef(-90, 0, 0, 1);
-		hFrameLeft.DrawWireframe();
-		//hFrameLeft.DrawColor();
+		drawShape(hFrameLeft);
 		glPopMatrix();
 
 		glPushMatrix();
@@ -322,8 +325,7 @@ namespace Assignment {
 			0
 		);
 		glRotatef(90, 0, 0, 1);
-		hFrameRight.DrawWireframe();
-		//hFrameRight.DrawColor();
+		drawShape(hFrameRight);
 		glPopMatrix();
 
 		//--------------------------------------------------------------------------------
@@ -339,8 +341,7 @@ namespace Assignment {
 		);
 		// make the center vertical
 		glRotatef(90, 1, 0, 0);
-		center.DrawWireframe();
-		//center.DrawColor();
+		drawShape(center);
 		glPopMatrix();
 
 		//--------------------------------------------------------------------------------
@@ -363,8 +364,7 @@ namespace Assignment {
 			BASE_H * 2 + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2,
 			HFRAME_BODY_L
 		);
-		wheel.DrawWireframe();
-		//wheel.DrawColor();
+		drawShape(wheel);
 		glPopMatrix();
 
 		//--------------------------------------------------------------------------------
@@ -380,9 +380,7 @@ namespace Assignment {
 		);
 		// make the pin horizontal
 		glRotatef(90, 1, 0, 0);
-
-		pin.DrawWireframe();
-		//pin.DrawColor();
+		drawShape(pin);
 		glPopMatrix();
 
 		//--------------------------------------------------------------------------------
@@ -402,9 +400,7 @@ namespace Assignment {
 			BASE_H * 2 + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2,
 			HFRAME_BODY_L + WHEEL_THICKNESS / 2 + SLIDER_L / 2
 		);
-
-		slider.DrawWireframe();
-		//slider.DrawColor();
+		drawShape(slider);
 		glPopMatrix();
 
 		//--------------------------------------------------------------------------------
@@ -420,8 +416,7 @@ namespace Assignment {
 		);
 		// make the rod horizontal
 		glRotatef(90, 0, 0, 1);
-		rodLeft.DrawWireframe();
-		//rodLeft.DrawColor();
+		drawShape(rodLeft);
 		glPopMatrix();
 
 		glPushMatrix();
@@ -434,8 +429,7 @@ namespace Assignment {
 		);
 		// make the rod horizontal
 		glRotatef(90, 0, 0, 1);
-		rodRight.DrawWireframe();
-		//rodRight.DrawColor();
+		drawShape(rodRight);
 		glPopMatrix();
 
 		glFlush();
@@ -456,16 +450,6 @@ namespace Assignment {
 		glutInitWindowSize(screenWidth, screenHeight); //set window size
 		glutInitWindowPosition(100, 100); // set window position on screen
 		glutCreateWindow("Assignment - Scotch Yoke Mechanism - HK241 HCMUT"); // open the screen window
-
-		/*tetrahedron.CreateTetrahedron();
-		cube.CreateCube(1);
-		cuboid.CreateCuboid(1, 2, 3);
-		cylinder.CreateCylinder(10, 2, 1);
-		cylinderWithHole.CreateCylinderWithHole(10, 2, 1, 0.5);
-		vFrame.CreateVerticalFrame(1, 2, 4, 1, 1, 2);
-		hFrame.CreateHorizontalFrame(1, 2, 4, 1, 2);
-		wheel.CreateWheel(0.2, 0.7, 3, 3.5, 5, 0.5, 1, 100);
-		slider.CreateSlider(3, 4, 7, 1);*/
 
 		myInit();
 		glutKeyboardFunc(myKeyboard);
