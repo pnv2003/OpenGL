@@ -471,6 +471,9 @@ namespace Assignment {
 		cout << "down arrow: to decrease camera height." << endl;
 		cout << "<-        : to rotate camera clockwise." << endl;
 		cout << "->        : to rotate camera counterclockwise." << endl;
+		cout << "W/w       : to toggle color mode." << endl;
+		cout << "1         : to rotate the wheel counterclockwise." << endl;
+		cout << "2         : to rotate the wheel clockwise." << endl;
 
 		//glutInit(&argc, (char**)argv); //initialize the tool kit
 		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);//set the display mode
