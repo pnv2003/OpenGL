@@ -111,6 +111,39 @@ void Mesh::SetColor(int colorIdx) {
 	}
 }
 
+void Mesh::CalculateFacesNorm() 
+{
+	// using Newell's method
+	for (int f = 0; f < numFaces; f++)
+	{
+		Vector3 fnorm(0, 0, 0);
+		for (int v = 0; v < face[f].nVerts; v++)
+		{
+			int		v1 = face[f].vert[v].vertIndex;
+			int		v2 = face[f].vert[(v + 1) % face[f].nVerts].vertIndex;
+			fnorm.x += (pt[v1].y - pt[v2].y) * (pt[v1].z + pt[v2].z);
+			fnorm.y += (pt[v1].z - pt[v2].z) * (pt[v1].x + pt[v2].x);
+			fnorm.z += (pt[v1].x - pt[v2].x) * (pt[v1].y + pt[v2].y);
+		}
+		fnorm.normalize();
+		face[f].facenorm = fnorm;
+	}
+}
+
+void Mesh::Draw()
+{
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	for (int f = 0; f < numFaces; f++) {
+		glBegin(GL_POLYGON);
+		for (int v = 0; v < face[f].nVerts; v++) {
+			int		iv = face[f].vert[v].vertIndex;
+			glNormal3f(face[f].facenorm.x, face[f].facenorm.y, face[f].facenorm.z);
+			glVertex3f(pt[iv].x, pt[iv].y, pt[iv].z);
+		}
+		glEnd();
+	}
+}
+
 void Mesh::CreateTetrahedron()
 {
 	int i;

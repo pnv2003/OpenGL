@@ -16,6 +16,7 @@ class Face
 public:
 	int		nVerts;
 	VertexID* vert;
+	Vector3		facenorm;
 
 	Face()
 	{
@@ -65,6 +66,8 @@ public:
 	void DrawWireframe();
 	void DrawColor();
 	void SetColor(int colorIdx);
+	void CalculateFacesNorm();
+	void Draw();
 
 	void CreateTetrahedron();
 	void CreateCube(float	fSize);

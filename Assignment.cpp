@@ -105,6 +105,44 @@ namespace Assignment {
 		glutPostRedisplay();
 	}
 
+	void setLight() 
+	{
+		const GLfloat leftLightDiffColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		const GLfloat leftLightSpecColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		const GLfloat leftLightAmbColor[] = { 0.4f, 0.4f, 0.4f, 1.0f };
+		const GLfloat leftLightPos[] = { 6.0, 6.0, 6.0, 0.0 };
+
+		const GLfloat rightLightDiffColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		const GLfloat rightLightSpecColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		const GLfloat rightLightAmbColor[] = { 0.4f, 0.f, 0.4f, 1.0f };
+		const GLfloat rightLightPos[] = { -6.0, 6.0, -6.0, 0.0 };
+
+		glEnable(GL_LIGHTING);
+		glEnable(GL_NORMALIZE);
+
+		//set up right light
+		glLightfv(GL_LIGHT0, GL_POSITION, rightLightPos);
+		glLightfv(GL_LIGHT0, GL_AMBIENT, rightLightAmbColor);
+		glLightfv(GL_LIGHT0, GL_DIFFUSE, rightLightDiffColor);
+		glLightfv(GL_LIGHT0, GL_SPECULAR, rightLightSpecColor);
+		glEnable(GL_LIGHT0);
+
+		//set up left light
+		glLightfv(GL_LIGHT1, GL_POSITION, leftLightPos);
+		glLightfv(GL_LIGHT1, GL_AMBIENT, leftLightAmbColor);
+		glLightfv(GL_LIGHT1, GL_DIFFUSE, leftLightDiffColor);
+		glLightfv(GL_LIGHT1, GL_SPECULAR, leftLightSpecColor);
+		glEnable(GL_LIGHT1);
+	}
+
+	void setMaterial(float ambient[], float diffuse[], float specular[], float shininess)
+	{
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
+	}
+
 	void mySpecialKeyboard(int theKey, int mouseX, int mouseY)
 	{
 		//code here
@@ -194,8 +232,8 @@ namespace Assignment {
 	{
 		if (color_mode && colorIdx >= 0)
 		{
-			mesh.SetColor(colorIdx);
-			mesh.DrawColor();
+			//mesh.SetColor(colorIdx);
+			mesh.Draw();
 		}
 		else
 			mesh.DrawWireframe();
@@ -207,24 +245,62 @@ namespace Assignment {
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		gluLookAt(camera_X, camera_Y, camera_Z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+		gluLookAt(
+			camera_X, camera_Y, camera_Z, 
+			0.0, BASE_H + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2, 0.0, 
+			0.0, 1.0, 0.0
+		);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		drawAxis();
+		setLight();
 
 		glColor3f(0, 0, 0);
 
+		// formula for lighting:
+		// IR = Iar 	Par + Idr 	Pdr Lambert + Isr 	Psr phong^f
+		// IG = Iag 	Pag + Idg 	Pdg Lambert + Isg 	Psg phong^f
+		// IB = Iab 	Pab + Idb 	Pdb Lambert + Isb 	Psb phong^f
+		// Iar, Iag, Iab = ambient light intensity
+		// Idr, Idg, Idb = diffuse light intensity
+		// Isr, Isg, Isb = specular light intensity
+		// Par, Pag, Pab = ambient light properties
+		// Pdr, Pdg, Pdb = diffuse light properties
+		// Psr, Psg, Psb = specular light properties
+		// f = shininess constant
+		// Lambert = N.L
+		// Phong = R.V
+
+		// material properties
+		GLfloat mat_ambient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+		GLfloat mat_diffuse[] = { 0.0f, 0.0f, 0.0f, 1.0f }; // to be set later
+		GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		GLfloat mat_shininess = 50.0f;
+
 		//--------------------------------------------------------------------------------
 		// draw base
+		// rgb(231, 141, 96)
+		mat_diffuse[0] = 231.0f / 255;
+		mat_diffuse[1] = 141.0f / 255;
+		mat_diffuse[2] = 96.0f / 255;
+		setMaterial(mat_ambient, mat_diffuse, mat_specular, mat_shininess);
+
 		glPushMatrix();
 		base.CreateCuboid(BASE_L, BASE_H, BASE_W);
-		glTranslatef(0, BASE_H, 0);
+		base.CalculateFacesNorm();
+		glTranslatef(0, BASE_H, 0);		
 		drawShape(base, BASE_COLOR);
 		glPopMatrix();
 
 		//--------------------------------------------------------------------------------
 		// draw vertical frame 
+		// rgb(231, 51, 51)
+		mat_diffuse[0] = 231.0f / 255;
+		mat_diffuse[1] = 51.0f / 255;
+		mat_diffuse[2] = 51.0f / 255;
+		setMaterial(mat_ambient, mat_diffuse, mat_specular, mat_shininess);
+
 		glPushMatrix();
 		vFrameLeft.CreateVerticalFrame(
 			VFRAME_BODY_W,
@@ -234,12 +310,14 @@ namespace Assignment {
 			VFRAME_FOOT_H,
 			VFRAME_KNEE_H
 		);
+		vFrameLeft.CalculateFacesNorm();
 		// put the frame on the base
 		glTranslatef(
 			-BASE_L * 3 / 4,
 			(VFRAME_BODY_H + VFRAME_FOOT_H + VFRAME_KNEE_H) / 2 + BASE_H * 2,
 			0
 		);
+
 		drawShape(vFrameLeft, VFRAME_COLOR);
 		glPopMatrix();
 
@@ -252,6 +330,7 @@ namespace Assignment {
 			VFRAME_FOOT_H,
 			VFRAME_KNEE_H
 		);
+		vFrameRight.CalculateFacesNorm();
 		// put the frame on the base
 		glTranslatef(
 			BASE_L * 3 / 4,
@@ -263,9 +342,15 @@ namespace Assignment {
 
 		//--------------------------------------------------------------------------------
 		// draw holder
+		// rgb(141, 51, 51)
+		mat_diffuse[0] = 141.0f / 255;
+		mat_diffuse[1] = 51.0f / 255;
+		mat_diffuse[2] = 51.0f / 255;
+		setMaterial(mat_ambient, mat_diffuse, mat_specular, mat_shininess);
 
 		glPushMatrix();
 		holderLeft.CreateHollowCube(16, HOLDER_SIZE, HOLDER_RADIUS);
+		holderLeft.CalculateFacesNorm();
 		// put the holder on the vframe
 		glTranslatef(
 			-BASE_L * 3 / 4,
@@ -278,6 +363,7 @@ namespace Assignment {
 
 		glPushMatrix();
 		holderRight.CreateHollowCube(16, HOLDER_SIZE, HOLDER_RADIUS);
+		holderRight.CalculateFacesNorm();
 		// put the holder on the vframe
 		glTranslatef(
 			BASE_L * 3 / 4,
@@ -293,6 +379,7 @@ namespace Assignment {
 
 		glPushMatrix();
 		holderPadLeft.CreateCuboid(HOLDER_SIZE / 2, HOLDER_SIZE / 2, WHEEL_THICKNESS / 2);
+		holderPadLeft.CalculateFacesNorm();
 		// put the holder pad between the vframe and the holder
 		glTranslatef(
 			-BASE_L * 3 / 4,
@@ -304,6 +391,7 @@ namespace Assignment {
 
 		glPushMatrix();
 		holderPadRight.CreateCuboid(HOLDER_SIZE / 2, HOLDER_SIZE / 2, WHEEL_THICKNESS / 2);
+		holderPadRight.CalculateFacesNorm();
 		// put the holder pad between the vframe and the holder
 		glTranslatef(
 			BASE_L * 3 / 4,
@@ -315,6 +403,12 @@ namespace Assignment {
 		
 		//--------------------------------------------------------------------------------
 		// draw horizontal frame
+		// rgb(231, 51, 51)
+		mat_diffuse[0] = 231.0f / 255;
+		mat_diffuse[1] = 51.0f / 255;
+		mat_diffuse[2] = 51.0f / 255;
+		setMaterial(mat_ambient, mat_diffuse, mat_specular, mat_shininess);
+
 		glPushMatrix();
 		hFrameLeft.CreateHorizontalFrame(
 			HFRAME_BODY_L,
@@ -323,6 +417,7 @@ namespace Assignment {
 			HFRAME_FOOT_L,
 			HFRAME_KNEE_H
 		);
+		hFrameLeft.CalculateFacesNorm();
 		// put the frame on the vframe side
 		glTranslatef(
 			-(HFRAME_BODY_H + HFRAME_KNEE_H) / 2,
@@ -341,6 +436,7 @@ namespace Assignment {
 			HFRAME_FOOT_L,
 			HFRAME_KNEE_H
 		);
+		hFrameRight.CalculateFacesNorm();
 		// put the frame on the vframe side
 		glTranslatef(
 			(HFRAME_BODY_H + HFRAME_KNEE_H) / 2,
@@ -353,9 +449,15 @@ namespace Assignment {
 
 		//--------------------------------------------------------------------------------
 		// draw wheel center
+		// rgb(87, 87, 87)
+		mat_diffuse[0] = 87.0f / 255;
+		mat_diffuse[1] = 87.0f / 255;
+		mat_diffuse[2] = 87.0f / 255;
+		setMaterial(mat_ambient, mat_diffuse, mat_specular, mat_shininess);
 
 		glPushMatrix();
 		center.CreateCylinder(100, WHEEL_THICKNESS, WHEEL_RADIUS_CENTER_OUTER - WHEEL_RADIUS_CENTER_INNER);
+		center.CalculateFacesNorm();
 		// put the wheel on the hframe
 		glTranslatef(
 			0,
@@ -369,6 +471,11 @@ namespace Assignment {
 
 		//--------------------------------------------------------------------------------
 		// draw wheel
+		// rgb(51, 51, 231)
+		mat_diffuse[0] = 51.0f / 255;
+		mat_diffuse[1] = 51.0f / 255;
+		mat_diffuse[2] = 231.0f / 255;
+		setMaterial(mat_ambient, mat_diffuse, mat_specular, mat_shininess);
 
 		glPushMatrix();
 		wheel.CreateWheel(
@@ -381,6 +488,7 @@ namespace Assignment {
 			WHEEL_THICKNESS,
 			100
 		);
+		wheel.CalculateFacesNorm();
 		// put the wheel on the hframe
 		glTranslatef(
 			0,
@@ -394,9 +502,15 @@ namespace Assignment {
 
 		//--------------------------------------------------------------------------------
 		// draw pin
+		// rgb(231, 51, 51)
+		mat_diffuse[0] = 231.0f / 255;
+		mat_diffuse[1] = 51.0f / 255;
+		mat_diffuse[2] = 51.0f / 255;
+		setMaterial(mat_ambient, mat_diffuse, mat_specular, mat_shininess);
 
 		glPushMatrix();
 		pin.CreateCylinder(10, PIN_HEIGHT, PIN_RADIUS);
+		pin.CalculateFacesNorm();
 		// put the pin on the wheel
 		glTranslatef(
 			0,
@@ -412,6 +526,11 @@ namespace Assignment {
 
 		//--------------------------------------------------------------------------------
 		// draw slider
+		// rgb(51, 231, 51)
+		mat_diffuse[0] = 51.0f / 255;
+		mat_diffuse[1] = 231.0f / 255;
+		mat_diffuse[2] = 51.0f / 255;
+		setMaterial(mat_ambient, mat_diffuse, mat_specular, mat_shininess);
 
 		glPushMatrix();
 		slider.CreateSlider(
@@ -420,6 +539,7 @@ namespace Assignment {
 			SLIDER_H,
 			SLIDER_THICKNESS
 		);
+		slider.CalculateFacesNorm();
 
 		// put the slider on the pin
 		glTranslatef(
@@ -435,6 +555,7 @@ namespace Assignment {
 
 		glPushMatrix();
 		rodLeft.CreateCylinder(10, ROD_LENGTH, ROD_RADIUS);
+		rodLeft.CalculateFacesNorm();
 		// put the rod on the slider, through the holder
 		glTranslatef(
 			-ROD_LENGTH / 2 - SLIDER_W / 2 + PIN_CENTER_DIST * cos(DEG2RAD(pin_angle)),
@@ -448,6 +569,7 @@ namespace Assignment {
 
 		glPushMatrix();
 		rodRight.CreateCylinder(10, ROD_LENGTH, ROD_RADIUS);
+		rodRight.CalculateFacesNorm();
 		// put the rod on the slider, through the holder
 		glTranslatef(
 			ROD_LENGTH / 2 + SLIDER_W / 2 + PIN_CENTER_DIST * cos(DEG2RAD(pin_angle)),
