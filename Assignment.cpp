@@ -32,6 +32,7 @@ namespace Assignment {
 	float camera_X, camera_Y, camera_Z;
 	float lookAt_X, lookAt_Y, lookAt_Z;
 	bool color_mode = false;
+	bool _2D_mode = false;
 
 	float CAMERA_SPEED = 5;
 	float WHEEL_SPEED = 5;
@@ -87,13 +88,23 @@ namespace Assignment {
 
 	// state variables
 	GLfloat pin_angle = 270;
+	GLfloat rotate_direction = 1; // 1 means rotate counter clockwise, -1 means rotate clockwise
+	bool auto_rotate = false;
 	GLfloat PIN_CENTER_DIST = WHEEL_RADIUS_BORDER_INNER + (WHEEL_RADIUS_BORDER_OUTER - WHEEL_RADIUS_BORDER_INNER) / 2;
 
 	void mySetupCameraVolume()
 	{
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		gluPerspective(60.0f, (GLfloat)screenWidth / (GLfloat)screenHeight, 1.0f, 1000.0f);
+		if (_2D_mode) {
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+            glOrtho(-10, 10, -10, 10, 1, 1000);
+		} 
+		else 
+		{
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			gluPerspective(60.0f, (GLfloat)screenWidth / (GLfloat)screenHeight, 1.0f, 1000.0f);
+		}
 	}
 
 	void changeCameraPos()
@@ -167,32 +178,6 @@ namespace Assignment {
 		}
 	}
 
-	void myKeyboard(unsigned char key, int x, int y)
-	{
-		switch (key)
-		{
-		case '+':
-			camera_dis += 0.1 * CAMERA_SPEED;
-			changeCameraPos();
-			break;
-		case '-':
-			camera_dis -= 0.1 * CAMERA_SPEED;
-			changeCameraPos();
-			break;
-		case 'W':
-		case 'w': 
-			color_mode = !color_mode;
-			break;
-		case '1':
-			pin_angle += WHEEL_SPEED;
-			break;
-		case '2':
-			pin_angle -= WHEEL_SPEED;
-			break;
-		}
-		glutPostRedisplay();
-	}
-
 	void myInit()
 	{
 		float	fHalfSize = 3;
@@ -238,22 +223,39 @@ namespace Assignment {
 		else
 			mesh.DrawWireframe();
 	}
-	void myDisplay()
-	{
+    void myDisplay()
+    {
 		mySetupCameraVolume();
-		glViewport(0, 0, screenWidth, screenHeight);
 
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		gluLookAt(
-			camera_X, camera_Y, camera_Z, 
-			0.0, BASE_H + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2, 0.0, 
-			0.0, 1.0, 0.0
-		);
+		if (_2D_mode) {
+			glViewport(0, -screenHeight / 2, screenWidth, screenHeight * 2);
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity();
+			gluLookAt(
+				0.0, BASE_H + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2, camera_dis,
+				0.0, BASE_H + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2, 0.0,
+				0.0, 1.0, 0.0
+			);
 
-		drawAxis();
+			glDisable(GL_DEPTH_TEST);
+			glClear(GL_COLOR_BUFFER_BIT);
+		}
+		else {
+			glViewport(0, 0, screenWidth, screenHeight);
+
+			glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity();
+			gluLookAt(
+				camera_X, camera_Y, camera_Z,
+				0.0, BASE_H + VFRAME_FOOT_H + VFRAME_KNEE_H + VFRAME_BODY_H / 2, 0.0,
+				0.0, 1.0, 0.0
+			);
+
+			glEnable(GL_DEPTH_TEST);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		}
+		//drawAxis();
 		setLight();
 
 		glColor3f(0, 0, 0);
@@ -400,7 +402,7 @@ namespace Assignment {
 		);
 		drawShape(holderPadRight, HOLDER_COLOR);
 		glPopMatrix();
-		
+					
 		//--------------------------------------------------------------------------------
 		// draw horizontal frame
 		// rgb(231, 51, 51)
@@ -583,6 +585,83 @@ namespace Assignment {
 
 		glFlush();
 		glutSwapBuffers();
+    }
+
+	void rotate()
+	{
+		pin_angle += WHEEL_SPEED * rotate_direction;
+		if (pin_angle >= 360)
+			pin_angle -= 360;
+		else if (pin_angle < 0)
+			pin_angle += 360;
+	}
+
+	//void myIdle()
+	//{
+	//	rotate(); // slow down bruh, it's too fast
+	//	cout << pin_angle << endl;
+	//	myDisplay();
+	//}
+
+	void processTimer(int value)
+	{
+		if (auto_rotate)
+		{
+			rotate();
+			myDisplay();
+			glutTimerFunc(1000 / 60, processTimer, value);
+		}
+	}
+
+	void myKeyboard(unsigned char key, int x, int y)
+	{
+		switch (key)
+		{
+		case '+':
+			camera_dis += 0.1 * CAMERA_SPEED;
+			changeCameraPos();
+			break;
+		case '-':
+			camera_dis -= 0.1 * CAMERA_SPEED;
+			changeCameraPos();
+			break;
+		case 'w':
+		case 'W':
+			color_mode = !color_mode;
+			break;
+		case '1':
+			rotate_direction = 1;
+			rotate();
+			break;
+		case '2':
+			rotate_direction = -1;
+			rotate();
+			break;
+		case 'a':
+		case 'A':
+			if (auto_rotate)
+			{
+				auto_rotate = false;
+				//glutIdleFunc(NULL);
+				processTimer(0);
+			}
+			else
+			{
+				auto_rotate = true;
+				//glutIdleFunc(myIdle);
+				processTimer(1);
+			}
+			break;
+		case 'b':
+		case 'B':
+			rotate_direction = -rotate_direction;
+			break;
+		case 'v':
+		case 'V':
+			_2D_mode = !_2D_mode;
+			break;
+		}
+		myDisplay();
 	}
 
 	int main()
@@ -593,15 +672,17 @@ namespace Assignment {
 		cout << "down arrow: to decrease camera height." << endl;
 		cout << "<-        : to rotate camera clockwise." << endl;
 		cout << "->        : to rotate camera counterclockwise." << endl;
-		cout << "W/w       : to toggle color mode." << endl;
+		cout << "w/W       : to toggle color mode." << endl;
 		cout << "1         : to rotate the wheel counterclockwise." << endl;
 		cout << "2         : to rotate the wheel clockwise." << endl;
+		cout << "a/A       : to toggle auto rotate." << endl;
+		cout << "b/B       : to toggle rotate direction." << endl;
 
 		//glutInit(&argc, (char**)argv); //initialize the tool kit
 		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);//set the display mode
 		glutInitWindowSize(screenWidth, screenHeight); //set window size
 		glutInitWindowPosition(100, 100); // set window position on screen
-		glutCreateWindow("Assignment - Scotch Yoke Mechanism - HK241 HCMUT"); // open the screen window
+		glutCreateWindow("Ngo Van Phuong - 2112070"); // open the screen window
 
 		myInit();
 		glutKeyboardFunc(myKeyboard);
