@@ -737,26 +737,26 @@ void Mesh::CreateHollowCube(int nSegment, float size, float radius) {
 }
 
 void Mesh::CreateVerticalFrame(
-	double bodyX, double bodyY, double bodyZ,
-	double feetLength,
-	double feetHeight,
-	double feetDistance
+	float bodyX, float bodyY, float bodyZ,
+	float feetLength,
+	float feetHeight,
+	float feetDistance
 ) {
 	int i;
 
 	numVerts = 16;
 	pt = new Point3[numVerts];
 
-	double hTotal = bodyZ + feetDistance + feetHeight;
-	double bodyX2 = bodyX / 2;
-	double bodyY2 = bodyY / 2;
-	double feetX2 = (bodyX + feetLength) / 2;
-	double feetY2 = (bodyY + feetLength) / 2;
+	float hTotal = bodyZ + feetDistance + feetHeight;
+	float bodyX2 = bodyX / 2;
+	float bodyY2 = bodyY / 2;
+	float feetX2 = (bodyX + feetLength) / 2;
+	float feetY2 = (bodyY + feetLength) / 2;
 
-	double hTop = hTotal / 2;
-	double hMid1 = -hTotal / 2 + feetHeight + feetDistance;
-	double hMid2 = -hTotal / 2 + feetHeight;
-	double hBot = -hTotal / 2;
+	float hTop = hTotal / 2;
+	float hMid1 = -hTotal / 2 + feetHeight + feetDistance;
+	float hMid2 = -hTotal / 2 + feetHeight;
+	float hBot = -hTotal / 2;
 
     pt[0].set(-bodyY2, hTop, bodyX2);
     pt[1].set(-bodyY2, hTop, -bodyX2);
@@ -817,24 +817,24 @@ void Mesh::CreateVerticalFrame(
 }
 
 void Mesh::CreateHorizontalFrame(
-	double bodyX, double bodyY, double bodyZ,
-	double feetLength,
-	double feetDistance
+	float bodyX, float bodyY, float bodyZ,
+	float feetLength,
+	float feetDistance
 ) {
 	int i;
 
 	numVerts = 12;
 	pt = new Point3[numVerts];
 
-	double hTotal = bodyZ + feetDistance;
-	double bodyX2 = bodyX / 2;
-	double bodyY2 = bodyY / 2;
-	double feetX2 = bodyX / 2;
-	double feetY2 = (bodyY + feetLength) / 2;
+	float hTotal = bodyZ + feetDistance;
+	float bodyX2 = bodyX / 2;
+	float bodyY2 = bodyY / 2;
+	float feetX2 = bodyX / 2;
+	float feetY2 = (bodyY + feetLength) / 2;
 
-	double hTop = hTotal / 2;
-	double hMid = -hTotal / 2 + feetDistance;
-	double hBot = -hTotal / 2;
+	float hTop = hTotal / 2;
+	float hMid = -hTotal / 2 + feetDistance;
+	float hBot = -hTotal / 2;
 
     pt[0].set(-bodyY2, hTop, bodyX2);
     pt[1].set(-bodyY2, hTop, -bodyX2);
@@ -884,21 +884,21 @@ void Mesh::CreateHorizontalFrame(
 }
 
 void Mesh::CreateWheel(
-	double inR1, double inR2,
-	double outR1, double outR2,
-	int nSpoke, double spokeWidth,
-	double thickness, int nSegment
+	float inR1, float inR2,
+	float outR1, float outR2,
+	int nSpoke, float spokeWidth,
+	float thickness, int nSegment
 ) {
 	numVerts = nSegment * 8 + nSpoke * 8;
 	pt = new Point3[numVerts];
 
 	int	i;
 	int	idx;
-	double angle = 2 * PI / nSegment;
-	double x, y, z;
+	float angle = 2 * PI / nSegment;
+	float x, y, z;
 
-	double hTop = thickness / 2;
-	double hBot = -thickness / 2;
+	float hTop = thickness / 2;
+	float hBot = -thickness / 2;
 
 	// circles
 	// 0 -> nseg*2: inR1
@@ -907,11 +907,11 @@ void Mesh::CreateWheel(
 	// nseg*6 -> nseg*8: outR2
 	// 1st half: top, 2nd half: bot
 	int ptIndex[4] = { 0, nSegment * 2, nSegment * 4, nSegment * 6 };
-	double rad[4] = { inR1, inR2, outR1, outR2 };
+	float rad[4] = { inR1, inR2, outR1, outR2 };
 
 	for (int j = 0; j < 4; ++j) {
 		idx = ptIndex[j];
-		double radius = rad[j];
+		float radius = rad[j];
 
 		for (i = 0; i < nSegment; i++)
 		{
@@ -937,9 +937,9 @@ void Mesh::CreateWheel(
 
 	angle = 2 * PI / nSpoke;
 	for (i = 0; i < 2; ++i) {
-		double theta = asin(spokeWidth / 2 / rad[i]);
+		float theta = asin(spokeWidth / 2 / rad[i]);
 		idx = ptIndex[i];
-		double radius = rad[i];
+		float radius = rad[i];
 
 		for (int s = 0; s < nSpoke; ++s) {
 			x = radius * cos(angle * s - theta);
@@ -1168,23 +1168,23 @@ void Mesh::CreateWheel(
 }
 
 void Mesh::CreateSlider(
-	double x, double y, double z, 
-	double thickness
+	float x, float y, float z, 
+	float thickness
 ) {
 	int i;
 
 	numVerts = 16;
 	pt = new Point3[numVerts];
 
-	double hTop1 = z / 2;
-	double hBot1 = -z / 2;
-	double hTop2 = (z - thickness * 2) / 2;
-	double hBot2 = -(z - thickness * 2) / 2;;
+	float hTop1 = z / 2;
+	float hBot1 = -z / 2;
+	float hTop2 = (z - thickness * 2) / 2;
+	float hBot2 = -(z - thickness * 2) / 2;;
 
-	double xOut = x / 2;
-	double yOut = y / 2;
-	double xIn = x / 2;
-	double yIn = (y - thickness * 2) / 2;
+	float xOut = x / 2;
+	float yOut = y / 2;
+	float xIn = x / 2;
+	float yIn = (y - thickness * 2) / 2;
 
     pt[0].set(-yOut, hTop1, xOut);
     pt[1].set(-yOut, hTop1, -xOut);
@@ -1241,5 +1241,207 @@ void Mesh::CreateSlider(
 		for (int j = 0; j < 4; j++) {
 			face[i].vert[j].vertIndex = faces[i][j];
 		}
+	}
+}
+
+void Mesh::CreateGrayPattern(
+	float tileSize,
+	float diagPos,
+	float diagWidth,
+	float snowflakeRadius,
+	float snowflakeBorderWidth,
+	float snowflakePadding
+) {
+	numVerts = 14;
+	pt = new Point3[numVerts];
+
+	float SNOWFLAKE_ANGLE = 90.0 / 4;
+	float snowflakeLongRadius = snowflakeRadius * cos(DEG2RAD * SNOWFLAKE_ANGLE) / cos(DEG2RAD * SNOWFLAKE_ANGLE * 2);
+
+	// diagonal
+	pt[0].set(diagPos, 0, 0);
+	pt[1].set(diagPos + diagWidth, 0, 0);
+	pt[2].set(0, 0, diagPos + diagWidth);
+	pt[3].set(0, 0, diagPos);
+
+	// snowflake border
+	pt[4].set(
+		tileSize / 2, 0,
+		tileSize / 2 - (snowflakeLongRadius + snowflakePadding + snowflakeBorderWidth)
+	);
+	pt[5].set(
+		tileSize / 2, 0,
+		tileSize / 2 - (snowflakeLongRadius + snowflakePadding)
+	);
+	pt[6].set(
+		tileSize / 2 - (snowflakeRadius + snowflakePadding + snowflakeBorderWidth) * sin(DEG2RAD * SNOWFLAKE_ANGLE), 0,
+		tileSize / 2 - (snowflakeRadius + snowflakePadding + snowflakeBorderWidth) * cos(DEG2RAD * SNOWFLAKE_ANGLE)
+	);
+	pt[7].set(
+		tileSize / 2 - (snowflakeRadius + snowflakePadding) * sin(DEG2RAD * SNOWFLAKE_ANGLE), 0,
+		tileSize / 2 - (snowflakeRadius + snowflakePadding) * cos(DEG2RAD * SNOWFLAKE_ANGLE)
+	);
+	pt[8].set(
+		tileSize / 2 - (snowflakeLongRadius + snowflakePadding + snowflakeBorderWidth) * sin(DEG2RAD * SNOWFLAKE_ANGLE * 2), 0,
+		tileSize / 2 - (snowflakeLongRadius + snowflakePadding + snowflakeBorderWidth) * cos(DEG2RAD * SNOWFLAKE_ANGLE * 2)
+	);
+	pt[9].set(
+		tileSize / 2 - (snowflakeLongRadius + snowflakePadding) * sin(DEG2RAD * SNOWFLAKE_ANGLE * 2), 0,
+		tileSize / 2 - (snowflakeLongRadius + snowflakePadding) * cos(DEG2RAD * SNOWFLAKE_ANGLE * 2)
+	);
+	pt[10].set(
+		tileSize / 2 - (snowflakeRadius + snowflakePadding + snowflakeBorderWidth) * sin(DEG2RAD * SNOWFLAKE_ANGLE * 3), 0,
+		tileSize / 2 - (snowflakeRadius + snowflakePadding + snowflakeBorderWidth) * cos(DEG2RAD * SNOWFLAKE_ANGLE * 3)
+	);
+	pt[11].set(
+		tileSize / 2 - (snowflakeRadius + snowflakePadding) * sin(DEG2RAD * SNOWFLAKE_ANGLE * 3), 0,
+		tileSize / 2 - (snowflakeRadius + snowflakePadding) * cos(DEG2RAD * SNOWFLAKE_ANGLE * 3)
+	);
+	pt[12].set(
+		tileSize / 2 - (snowflakeLongRadius + snowflakePadding + snowflakeBorderWidth) * sin(DEG2RAD * SNOWFLAKE_ANGLE * 4), 0,
+		tileSize / 2 - (snowflakeLongRadius + snowflakePadding + snowflakeBorderWidth) * cos(DEG2RAD * SNOWFLAKE_ANGLE * 4)
+	);
+	pt[13].set(
+		tileSize / 2 - (snowflakeLongRadius + snowflakePadding) * sin(DEG2RAD * SNOWFLAKE_ANGLE * 4), 0,
+		tileSize / 2 - (snowflakeLongRadius + snowflakePadding) * cos(DEG2RAD * SNOWFLAKE_ANGLE * 4)
+	);
+
+	numFaces = 5;
+	face = new Face[numFaces];
+
+	int faces[5][4] = {
+		// diagonal
+		{ 0, 1, 2, 3 },
+		// snowflake border
+		{ 4, 5, 7, 6 },
+		{ 6, 7, 9, 8 },
+		{ 8, 9, 11, 10 },
+		{ 10, 11, 13, 12 }
+	};
+
+	for (int i = 0; i < numFaces; i++) {
+		face[i].nVerts = 4;
+		face[i].vert = new VertexID[face[i].nVerts];
+		for (int j = 0; j < 4; j++) {
+			face[i].vert[j].vertIndex = faces[i][j];
+		}
+	}
+}
+
+void Mesh::CreateBrownPattern(
+	float tileSize,
+	float straightPos,
+	float straightWidth,
+	float curveRadius,
+	float snowflakeRadius,
+	int nSegment = 100
+) {
+	numVerts = 14 + nSegment * 4;
+	pt = new Point3[numVerts];
+
+	float SNOWFLAKE_ANGLE = 90.0 / 4;
+	float snowflakeLongRadius = snowflakeRadius * cos(DEG2RAD * SNOWFLAKE_ANGLE) / cos(DEG2RAD * SNOWFLAKE_ANGLE * 2);
+
+	// straight
+	pt[0].set(straightPos, 0, 0);
+	pt[1].set(straightPos + straightWidth, 0, 0);
+	pt[2].set(straightPos + straightWidth, 0, tileSize / 2 - curveRadius);
+	pt[3].set(straightPos, 0, tileSize / 2 - curveRadius);
+
+	pt[4].set(0, 0, straightPos);
+	pt[5].set(0, 0, straightPos + straightWidth);
+	pt[6].set(tileSize / 2 - curveRadius, 0, straightPos + straightWidth);
+	pt[7].set(tileSize / 2 - curveRadius, 0, straightPos);
+
+	// snowflake
+	pt[8].set(
+		tileSize / 2 - snowflakeRadius * sin(DEG2RAD * SNOWFLAKE_ANGLE), 0,
+		tileSize / 2 - snowflakeRadius * cos(DEG2RAD * SNOWFLAKE_ANGLE)
+	);
+	pt[9].set(
+		tileSize / 2 - snowflakeLongRadius * sin(DEG2RAD * SNOWFLAKE_ANGLE * 2), 0,
+		tileSize / 2 - snowflakeLongRadius * cos(DEG2RAD * SNOWFLAKE_ANGLE * 2)
+	);
+	pt[10].set(
+		tileSize / 2 - snowflakeRadius * sin(DEG2RAD * SNOWFLAKE_ANGLE * 3), 0,
+		tileSize / 2 - snowflakeRadius * cos(DEG2RAD * SNOWFLAKE_ANGLE * 3)
+	);
+	pt[11].set(
+		tileSize / 2 - snowflakeLongRadius * sin(DEG2RAD * SNOWFLAKE_ANGLE * 4), 0,
+		tileSize / 2 - snowflakeLongRadius * cos(DEG2RAD * SNOWFLAKE_ANGLE * 4)
+	);
+	pt[12].set(tileSize / 2, 0, tileSize / 2);
+
+	// curve
+	float angle = 90.0 / (nSegment - 1);
+	for (int i = 0; i < nSegment; i++) {
+		pt[13 + i].set(
+			straightPos + straightWidth + (curveRadius + straightWidth) * cos(DEG2RAD * (angle * i + 180)), 0,
+			tileSize / 2 + (curveRadius + straightWidth) * sin(DEG2RAD * (angle * i + 180))
+		);
+		pt[13 + nSegment + i].set(
+			straightPos + straightWidth + curveRadius * cos(DEG2RAD * (angle * i + 180)), 0,
+			tileSize / 2 + curveRadius * sin(DEG2RAD * (angle * i + 180))
+		);
+		pt[13 + nSegment * 2 + i].set(
+			tileSize / 2 + (curveRadius + straightWidth) * cos(DEG2RAD * (angle * i + 180)), 0,
+			straightPos + straightWidth + (curveRadius + straightWidth) * sin(DEG2RAD * (angle * i + 180))
+		);
+		pt[13 + nSegment * 3 + i].set(
+			tileSize / 2 + curveRadius * cos(DEG2RAD * (angle * i + 180)), 0,
+			straightPos + straightWidth + curveRadius * sin(DEG2RAD * (angle * i + 180))
+		);
+	}
+
+	numFaces = 4 + nSegment * 2;
+	face = new Face[numFaces];
+
+	int idx = 0;
+	// straight
+	face[idx].nVerts = 4;
+	face[idx].vert = new VertexID[face[idx].nVerts];
+	for (int i = 0; i < 4; i++) {
+		face[idx].vert[i].vertIndex = i;
+	}
+	idx++;
+
+	face[idx].nVerts = 4;
+	face[idx].vert = new VertexID[face[idx].nVerts];
+	for (int i = 0; i < 4; i++) {
+		face[idx].vert[i].vertIndex = i + 4;
+	}
+	idx++;
+
+	// snowflake
+	face[idx].nVerts = 3;
+	face[idx].vert = new VertexID[face[idx].nVerts];
+	face[idx].vert[0].vertIndex = 8;
+	face[idx].vert[1].vertIndex = 9;
+	face[idx].vert[2].vertIndex = 12;
+	idx++;
+
+	face[idx].nVerts = 3;
+	face[idx].vert = new VertexID[face[idx].nVerts];
+	face[idx].vert[0].vertIndex = 10;
+	face[idx].vert[1].vertIndex = 11;
+	face[idx].vert[2].vertIndex = 12;
+	idx++;
+
+	// curve
+	for (int i = 0; i < nSegment - 1; i++) {
+		face[idx].nVerts = 4;
+		face[idx].vert = new VertexID[face[idx].nVerts];
+		face[idx].vert[0].vertIndex = 13 + i;
+		face[idx].vert[1].vertIndex = 13 + i + 1;
+		face[idx].vert[2].vertIndex = 13 + nSegment + i + 1;
+		face[idx].vert[3].vertIndex = 13 + nSegment + i;
+		idx++;
+		face[idx].nVerts = 4;
+		face[idx].vert = new VertexID[face[idx].nVerts];
+		face[idx].vert[0].vertIndex = 13 + nSegment * 2 + i;
+		face[idx].vert[1].vertIndex = 13 + nSegment * 2 + i + 1;
+		face[idx].vert[2].vertIndex = 13 + nSegment * 3 + i + 1;
+		face[idx].vert[3].vertIndex = 13 + nSegment * 3 + i;
+		idx++;
 	}
 }

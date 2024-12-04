@@ -79,27 +79,44 @@ public:
 
 	// scotch yoke components
 	void CreateVerticalFrame(
-		double bodyX, double bodyY, double bodyZ, 
-		double feetLength,
-		double feetHeight,
-		double feetDistance
+		float bodyX, float bodyY, float bodyZ, 
+		float feetLength,
+		float feetHeight,
+		float feetDistance
 	);
 	void CreateHorizontalFrame(
-		double bodyX, double bodyY, double bodyZ,
-		double feetLength,
-		double feetDistance
+		float bodyX, float bodyY, float bodyZ,
+		float feetLength,
+		float feetDistance
 	);
 	void CreateWheel(
-		double inR1, double inR2,
-		double outR1, double outR2,
-		int nSpoke, double spokeWidth,
-		double thickness, int nSegment
+		float inR1, float inR2,
+		float outR1, float outR2,
+		int nSpoke, float spokeWidth,
+		float thickness, int nSegment
 	);
 	void CreateSlider(
-		double x, double y, double z, 
-		double thickness
+		float x, float y, float z, 
+		float thickness
 	);
 
+	// tile patterns
+	void CreateGrayPattern(
+		float tileSize,
+		float diagPos,
+		float diagWidth,
+		float snowflakeRadius,
+		float snowflakeBorderWidth,
+		float snowflakePadding
+	);
+	void CreateBrownPattern(
+		float tileSize,
+		float straightPos,
+		float straightWidth,
+		float curveRadius,
+		float snowflakeRadius,
+		int nSegment
+	);
 };
 
 #endif

@@ -31,7 +31,7 @@ namespace Assignment {
 	float camera_dis;
 	float camera_X, camera_Y, camera_Z;
 	float lookAt_X, lookAt_Y, lookAt_Z;
-	bool color_mode = false;
+	bool color_mode = true;
 	bool _2D_mode = false;
 
 	float CAMERA_SPEED = 5;
@@ -65,6 +65,7 @@ namespace Assignment {
 	GLfloat WHEEL_NSPOKE = 5;
 	GLfloat WHEEL_WSPOKE = 1;
 	GLfloat WHEEL_THICKNESS = 0.5;
+	GLfloat WHEEL_SEGMENT = 100;
 	int WHEEL_COLOR = 5;// 18;
 
 	GLfloat PIN_RADIUS = 0.1;
@@ -78,13 +79,26 @@ namespace Assignment {
 	GLfloat SLIDER_W = SLIDER_THICKNESS * 2 + PIN_RADIUS * 2;
 	int SLIDER_COLOR = 0;// 19;
 
-	GLfloat ROD_RADIUS = 0.2;
+	GLfloat HOLDER_RADIUS = 0.2;
+	GLfloat HOLDER_SIZE = 0.75;
+	GLfloat HOLDER_SEGMENT = 16;
+	int HOLDER_COLOR = 1;// 16;
+
+	GLfloat ROD_RADIUS = HOLDER_RADIUS;
 	GLfloat ROD_LENGTH = 8;
+	GLfloat ROD_SEGMENT = HOLDER_SEGMENT;
 	int ROD_COLOR = 4;// 19;
 
-	GLfloat HOLDER_RADIUS = ROD_RADIUS;
-	GLfloat HOLDER_SIZE = 0.75;
-	int HOLDER_COLOR = 1;// 16;
+	GLfloat TILE_SIZE = 10;
+	GLfloat TILE_LIMIT = 50;
+	GLfloat DIAG_LINE_POS = 2;
+	GLfloat DIAG_LINE_WIDTH = 0.3;
+	GLfloat STRAIGHT_LINE_WIDTH = 0.5;
+	GLfloat CURVE_RADIUS = DIAG_LINE_POS + DIAG_LINE_WIDTH - STRAIGHT_LINE_WIDTH - 0.2;
+	GLfloat SNOWFLAKE_RADIUS = 1.5;
+	GLfloat SNOWFLAKE_BORDER_WIDTH = 0.2;
+	GLfloat SNOWFLAKE_PADDING = 0.05;
+	GLfloat TILE_SEGMENT = 10;
 
 	// state variables
 	GLfloat pin_angle = 270;
@@ -97,7 +111,7 @@ namespace Assignment {
 		if (_2D_mode) {
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-            glOrtho(-10, 10, -10, 10, 1, 1000);
+			glOrtho(-10, 10, -10, 10, -100, 100);
 		} 
 		else 
 		{
@@ -125,7 +139,7 @@ namespace Assignment {
 
 		const GLfloat rightLightDiffColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		const GLfloat rightLightSpecColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		const GLfloat rightLightAmbColor[] = { 0.4f, 0.f, 0.4f, 1.0f };
+		const GLfloat rightLightAmbColor[] = { 0.4f, 0.4f, 0.4f, 1.0f };
 		const GLfloat rightLightPos[] = { -6.0, 6.0, -6.0, 0.0 };
 
 		glEnable(GL_LIGHTING);
@@ -215,13 +229,85 @@ namespace Assignment {
 	}
 	void drawShape(Mesh& mesh, int colorIdx = -1)
 	{
-		if (color_mode && colorIdx >= 0)
+		if (color_mode)
 		{
-			//mesh.SetColor(colorIdx);
 			mesh.Draw();
 		}
 		else
 			mesh.DrawWireframe();
+	}
+	void drawQuartile()
+	{
+		// only draw a quarter of the tile
+
+		// material properties
+		GLfloat mat_ambient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
+		GLfloat mat_diffuse[] = { 0.0f, 0.0f, 0.0f, 1.0f }; // to be set later
+		GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		GLfloat mat_shininess = 200.0f;
+
+		mat_diffuse[0] = 164.0f / 255;
+		mat_diffuse[1] = 164.0f / 255;
+		mat_diffuse[2] = 164.0f / 255;
+		setMaterial(mat_ambient, mat_diffuse, mat_specular, mat_shininess);
+
+		//glNormal3f(0, 1, 0);
+		Mesh grayPattern;
+		grayPattern.CreateGrayPattern(
+			TILE_SIZE,
+			DIAG_LINE_POS,
+			DIAG_LINE_WIDTH,
+			SNOWFLAKE_RADIUS,
+			SNOWFLAKE_BORDER_WIDTH,
+			SNOWFLAKE_PADDING
+		);
+		grayPattern.CalculateFacesNorm();
+		drawShape(grayPattern);
+
+		mat_diffuse[0] = 105.0f / 255;
+		mat_diffuse[1] = 57.0f / 255;
+		mat_diffuse[2] = 47.0f / 255;
+		setMaterial(mat_ambient, mat_diffuse, mat_specular, mat_shininess);
+
+		Mesh brownPattern;
+		brownPattern.CreateBrownPattern(
+			TILE_SIZE,
+			DIAG_LINE_POS + DIAG_LINE_WIDTH,
+			STRAIGHT_LINE_WIDTH,
+			CURVE_RADIUS,
+			SNOWFLAKE_RADIUS,
+			TILE_SEGMENT
+		);
+		brownPattern.CalculateFacesNorm();
+		drawShape(brownPattern);
+
+	/*	glColor3f(1.0f, 0.0f, 0.0f);
+		glNormal3f(1, 0, 1);
+		glBegin(GL_QUADS);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glVertex3f(3, 0, 0);
+		glVertex3f(4, 0, 0);
+		glVertex3f(0, 0, 4);
+		glVertex3f(0, 0, 3);
+		glEnd();*/
+	}
+	void drawTile(int x, int y)
+	{
+		// draw a tile at position x, y
+		// draw 4 quartiles
+
+		glPushMatrix();
+		glTranslatef(x, 0, y);
+
+		drawQuartile();
+		glRotatef(90, 0, 1, 0);
+		drawQuartile();
+		glRotatef(90, 0, 1, 0);
+		drawQuartile();
+		glRotatef(90, 0, 1, 0);
+		drawQuartile();
+
+		glPopMatrix();
 	}
     void myDisplay()
     {
@@ -258,7 +344,7 @@ namespace Assignment {
 		//drawAxis();
 		setLight();
 
-		glColor3f(0, 0, 0);
+		//glColor3f(0, 0, 0);
 
 		// formula for lighting:
 		// IR = Iar 	Par + Idr 	Pdr Lambert + Isr 	Psr phong^f
@@ -351,7 +437,7 @@ namespace Assignment {
 		setMaterial(mat_ambient, mat_diffuse, mat_specular, mat_shininess);
 
 		glPushMatrix();
-		holderLeft.CreateHollowCube(16, HOLDER_SIZE, HOLDER_RADIUS);
+		holderLeft.CreateHollowCube(HOLDER_SEGMENT, HOLDER_SIZE, HOLDER_RADIUS);
 		holderLeft.CalculateFacesNorm();
 		// put the holder on the vframe
 		glTranslatef(
@@ -364,7 +450,7 @@ namespace Assignment {
 		glPopMatrix();
 
 		glPushMatrix();
-		holderRight.CreateHollowCube(16, HOLDER_SIZE, HOLDER_RADIUS);
+		holderRight.CreateHollowCube(HOLDER_SEGMENT, HOLDER_SIZE, HOLDER_RADIUS);
 		holderRight.CalculateFacesNorm();
 		// put the holder on the vframe
 		glTranslatef(
@@ -488,7 +574,7 @@ namespace Assignment {
 			WHEEL_NSPOKE,
 			WHEEL_WSPOKE,
 			WHEEL_THICKNESS,
-			100
+			WHEEL_SEGMENT
 		);
 		wheel.CalculateFacesNorm();
 		// put the wheel on the hframe
@@ -556,7 +642,7 @@ namespace Assignment {
 		// draw rod
 
 		glPushMatrix();
-		rodLeft.CreateCylinder(10, ROD_LENGTH, ROD_RADIUS);
+		rodLeft.CreateCylinder(ROD_SEGMENT, ROD_LENGTH, ROD_RADIUS);
 		rodLeft.CalculateFacesNorm();
 		// put the rod on the slider, through the holder
 		glTranslatef(
@@ -582,6 +668,36 @@ namespace Assignment {
 		glRotatef(90, 0, 0, 1);
 		drawShape(rodRight, ROD_COLOR);
 		glPopMatrix();
+
+		//--------------------------------------------------------------------------------
+		// draw floor tiles
+
+		for (float x = -TILE_LIMIT; x <= TILE_LIMIT; x += TILE_SIZE)
+		{
+			glColor3f(0, 0, 0);
+			glBegin(GL_LINES);
+			glVertex3f(x, 0, TILE_LIMIT);
+			glVertex3f(x, 0, -TILE_LIMIT);
+			glEnd();
+
+			for (float z = -TILE_LIMIT; z <= TILE_LIMIT; z += TILE_SIZE)
+			{
+				drawTile(x, z);
+			}
+		}
+		for (float z = -TILE_LIMIT; z <= TILE_LIMIT; z += TILE_SIZE)
+		{
+			glColor3f(0, 0, 0);
+			glBegin(GL_LINES);
+			glVertex3f(TILE_LIMIT, 0, z);
+			glVertex3f(-TILE_LIMIT, 0, z);
+			glEnd();
+
+			for (float x = -TILE_LIMIT; x <= TILE_LIMIT; x += TILE_SIZE)
+			{
+				drawTile(x, z);
+			}
+		}
 
 		glFlush();
 		glutSwapBuffers();
