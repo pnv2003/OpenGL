@@ -1,7 +1,7 @@
 //#include "stdafx.h"
 #include <math.h>
-#include <vector>
-#include <stdexcept>
+//#include <vector>
+//#include <stdexcept>
 #include "Mesh.h"
 using namespace std;
 
@@ -35,34 +35,42 @@ float	ColorArr[COLORNUM][3] = {
 	{51.0 / 255, 231.0 / 255, 51.0 / 255} // 19. green
 };
 	
-void grid(vector<vector<int>>& lad, const vector<int>& v1, const vector<int>& v2) {
-	if (v1.size() != v2.size())
-		throw runtime_error("Imbalance grid");
-	
-	for (int i = 0; i < v1.size(); ++i) {
-		if (i < v1.size() - 1) {
-			vector<int> face{ v1[i], v1[i + 1], v2[i + 1], v2[i]};
-			lad.push_back(face);
-		}
-		else {
-			vector<int> face{ v1[i], v1[0], v2[0], v2[i] };
-			lad.push_back(face);
-		}
-	}
-}
-
-void ladder(vector<vector<int>>& lad, const vector<int>& v1, const vector<int>& v2) {
-	if (v1.size() != v2.size())
-		throw runtime_error("Imbalance ladder");
-
-	for (int i = 0; i < v1.size(); i += 2) {
-		if (i == v1.size() - 1) 
-			break;
-
-		vector<int> face{ v1[i], v1[i + 1], v2[i + 1], v2[i] };
-		lad.push_back(face);
-	}
-}
+//void grid(vector<vector<int>>& lad, const vector<int>& v1, const vector<int>& v2) {
+//	if (v1.size() != v2.size())
+//		throw runtime_error("Imbalance grid");
+//
+//	// resolve bad_alloc exception
+//	//lad.clear();
+//	lad.reserve(v1.size());
+//	
+//	for (int i = 0; i < v1.size(); ++i) {
+//		if (i < v1.size() - 1) {
+//			vector<int> face{ v1[i], v1[i + 1], v2[i + 1], v2[i]};
+//			lad.push_back(face);
+//		}
+//		else {
+//			vector<int> face{ v1[i], v1[0], v2[0], v2[i] };
+//			lad.push_back(face);
+//		}
+//	}
+//}
+//
+//void ladder(vector<vector<int>>& lad, const vector<int>& v1, const vector<int>& v2) {
+//	if (v1.size() != v2.size())
+//		throw runtime_error("Imbalance ladder");
+//
+//	// resolve bad_alloc exception
+//	//lad.clear();
+//	lad.reserve(v1.size() * 2);
+//
+//	for (int i = 0; i < v1.size(); i += 2) {
+//		if (i == v1.size() - 1) 
+//			break;
+//
+//		vector<int> face{ v1[i], v1[i + 1], v2[i + 1], v2[i] };
+//		lad.push_back(face);
+//	}
+//}
 
 void Mesh::DrawWireframe()
 {
@@ -583,9 +591,9 @@ void Mesh::CreateCone(int nSegment, float height, float radius) {
 
 void Mesh::CreateHollowCube(int nSegment, float size, float radius) {
 
-	if (nSegment % 8 != 0) {
-		throw std::runtime_error("Segment count must be divisible by 8!");
-	}
+	//if (nSegment % 8 != 0) {
+		//throw std::runtime_error("Segment count must be divisible by 8!");
+	//}
 	// note: nSegment must be divisible by 8
 	int i;
 
@@ -655,7 +663,7 @@ void Mesh::CreateHollowCube(int nSegment, float size, float radius) {
 	numFaces = nSegment * 4;
 	face = new Face[numFaces];
 
-	vector<int> ptCircleTop;
+	/*vector<int> ptCircleTop;
 	vector<int> ptCircleBot;
 	vector<int> ptCubeTop;
 	vector<int> ptCubeBot;
@@ -672,15 +680,60 @@ void Mesh::CreateHollowCube(int nSegment, float size, float radius) {
 	grid(faces, ptCircleTop, ptCircleBot);
 	grid(faces, ptCircleTop, ptCubeTop);
 	grid(faces, ptCubeTop, ptCubeBot);
-	grid(faces, ptCircleBot, ptCubeBot);
+	grid(faces, ptCircleBot, ptCubeBot);*/
 
-	for (i = 0; i < numFaces; i++) {
+	int idxFace = 0;
+	// link top circle to bottom circle
+	for (i = 0; i < nSegment; i++) {
+		face[idxFace].nVerts = 4;
+		face[idxFace].vert = new VertexID[face[idxFace].nVerts];
+		face[idxFace].vert[0].vertIndex = i;
+		face[idxFace].vert[1].vertIndex = (i < nSegment - 1) ? i + 1 : 0;
+		face[idxFace].vert[2].vertIndex = (i < nSegment - 1) ? i + nSegment + 1 : nSegment;
+		face[idxFace].vert[3].vertIndex = i + nSegment;
+		idxFace++;
+	}
+
+	// link top circle to top cube
+	for (i = 0; i < nSegment; i++) {
+		face[idxFace].nVerts = 4;
+		face[idxFace].vert = new VertexID[face[idxFace].nVerts];
+		face[idxFace].vert[0].vertIndex = i;
+		face[idxFace].vert[1].vertIndex = (i < nSegment - 1) ? i + 1 : 0;
+		face[idxFace].vert[2].vertIndex = (i < nSegment - 1) ? i + nSegment * 2 + 1 : nSegment * 2;
+		face[idxFace].vert[3].vertIndex = i + nSegment * 2;
+		idxFace++;
+	}
+
+	// link top cube to bottom cube
+	for (i = 0; i < nSegment; i++) {
+		face[idxFace].nVerts = 4;
+		face[idxFace].vert = new VertexID[face[idxFace].nVerts];
+		face[idxFace].vert[0].vertIndex = i + nSegment * 2;
+		face[idxFace].vert[1].vertIndex = (i < nSegment - 1) ? i + nSegment * 2 + 1 : nSegment * 2;
+		face[idxFace].vert[2].vertIndex = (i < nSegment - 1) ? i + nSegment * 3 + 1 : nSegment * 3;
+		face[idxFace].vert[3].vertIndex = i + nSegment * 3;
+		idxFace++;
+	}
+
+	// link bottom circle to bottom cube
+	for (i = 0; i < nSegment; i++) {
+		face[idxFace].nVerts = 4;
+		face[idxFace].vert = new VertexID[face[idxFace].nVerts];
+		face[idxFace].vert[0].vertIndex = i + nSegment;
+		face[idxFace].vert[1].vertIndex = (i < nSegment - 1) ? i + nSegment + 1 : nSegment;
+		face[idxFace].vert[2].vertIndex = (i < nSegment - 1) ? i + nSegment * 3 + 1 : nSegment * 3;
+		face[idxFace].vert[3].vertIndex = i + nSegment * 3;
+		idxFace++;
+	}
+	
+	/*for (i = 0; i < numFaces; i++) {
 		face[i].nVerts = 4;
 		face[i].vert = new VertexID[face[i].nVerts];
 		for (int j = 0; j < 4; j++) {
 			face[i].vert[j].vertIndex = faces[i][j];
 		}
-	}
+	}*/
 }
 
 void Mesh::CreateVerticalFrame(
@@ -853,8 +906,8 @@ void Mesh::CreateWheel(
 	// nseg*4 -> nseg*6: outR1
 	// nseg*6 -> nseg*8: outR2
 	// 1st half: top, 2nd half: bot
-	vector<int> ptIndex{ 0, nSegment * 2, nSegment * 4, nSegment * 6 };
-	vector<double> rad{ inR1, inR2, outR1, outR2 };
+	int ptIndex[4] = { 0, nSegment * 2, nSegment * 4, nSegment * 6 };
+	double rad[4] = { inR1, inR2, outR1, outR2 };
 
 	for (int j = 0; j < 4; ++j) {
 		idx = ptIndex[j];
@@ -876,11 +929,12 @@ void Mesh::CreateWheel(
 	// nseg*8 -> nseg*8 + nspoke*4: inR2
 	// nseg*8 + nspoke*4 -> nseg*8 + nspoke*8: outR1
 	// 1st half: top, 2nd half: bot (each half has 2*nspoke points)
-	ptIndex = { 
-		nSegment * 8, 
-		nSegment * 8 + nSpoke * 4 
-	};
-	rad = { inR2, outR1 };
+
+	ptIndex[0] = nSegment * 8;
+	ptIndex[1] = nSegment * 8 + nSpoke * 4;
+	rad[0] = inR2;
+	rad[1] = outR2;
+
 	angle = 2 * PI / nSpoke;
 	for (i = 0; i < 2; ++i) {
 		double theta = asin(spokeWidth / 2 / rad[i]);
@@ -907,70 +961,201 @@ void Mesh::CreateWheel(
 	numFaces = nSegment * 8 + nSpoke * 4;
 	face = new Face[numFaces];
 
-	vector<int> v1{};
-	vector<int> v2{};
-	vector<int> v3{};
-	vector<int> v4{};
-	vector<int> v5{};
-	vector<int> v6{};
-	vector<int> v7{};
-	vector<int> v8{};
+	//vector<int> v1{};
+	//vector<int> v2{};
+	//vector<int> v3{};
+	//vector<int> v4{};
+	//vector<int> v5{};
+	//vector<int> v6{};
+	//vector<int> v7{};
+	//vector<int> v8{};
 
-	vector<int> vs1{};
-	vector<int> vs2{};
-	vector<int> vs3{};
-	vector<int> vs4{};
-	vector<int> vs5{};
-	vector<int> vs6{};
+	//vector<int> vs1{};
+	//vector<int> vs2{};
+	//vector<int> vs3{};
+	//vector<int> vs4{};
+	//vector<int> vs5{};
+	//vector<int> vs6{};
 
-	for (i = 0; i < nSegment; ++i) {
-		v1.push_back(i);
-		v2.push_back(i + nSegment);
-		v3.push_back(i + nSegment * 2);
-		v4.push_back(i + nSegment * 3);
-		v5.push_back(i + nSegment * 4);
-		v6.push_back(i + nSegment * 5);
-		v7.push_back(i + nSegment * 6);
-		v8.push_back(i + nSegment * 7);
+	//for (i = 0; i < nSegment; ++i) {
+	//	v1.push_back(i);
+	//	v2.push_back(i + nSegment);
+	//	v3.push_back(i + nSegment * 2);
+	//	v4.push_back(i + nSegment * 3);
+	//	v5.push_back(i + nSegment * 4);
+	//	v6.push_back(i + nSegment * 5);
+	//	v7.push_back(i + nSegment * 6);
+	//	v8.push_back(i + nSegment * 7);
+	//}
+
+	//for (i = 0; i < nSpoke*2; ++i) {
+	//	vs1.push_back(i + nSegment * 8); // inR2 top
+	//	vs2.push_back(i + nSegment * 8 + nSpoke * 2); // inR2 bot
+	//	vs3.push_back(i + nSegment * 8 + nSpoke * 4); // outR1 top
+	//	vs4.push_back(i + nSegment * 8 + nSpoke * 6); // outR1 bot
+	//}
+
+	//for (i = 0; i < nSpoke * 2; ++i) {
+	//	// inR2 vertical
+	//	vs5.push_back(i + nSegment * 8);
+	//	vs5.push_back(i + nSegment * 8 + nSpoke * 2);
+
+	//	// outR1 vertical
+	//	vs6.push_back(i + nSegment * 8 + nSpoke * 4);
+	//	vs6.push_back(i + nSegment * 8 + nSpoke * 6);
+	//}
+
+	//vector<vector<int>> faces{};
+
+	//// 1-3		5-7
+	//// | |		| |
+	//// 2-4		6-8
+	//grid(faces, v1, v2);
+	//grid(faces, v2, v4);
+	//grid(faces, v4, v3);
+	//grid(faces, v3, v1);
+
+	//grid(faces, v5, v6);
+	//grid(faces, v6, v8);
+	//grid(faces, v8, v7);
+	//grid(faces, v7, v5);
+
+	//ladder(faces, vs1, vs3);
+	//ladder(faces, vs2, vs4);
+	//ladder(faces, vs5, vs6);
+
+	int idxFace = 0;
+	// link v1 to v2
+	for (i = 0; i < nSegment; i++) {
+		face[idxFace].nVerts = 4;
+		face[idxFace].vert = new VertexID[face[idxFace].nVerts];
+		face[idxFace].vert[0].vertIndex = i;
+		face[idxFace].vert[1].vertIndex = (i < nSegment - 1) ? i + 1 : 0;
+		face[idxFace].vert[2].vertIndex = (i < nSegment - 1) ? i + nSegment + 1 : nSegment;
+		face[idxFace].vert[3].vertIndex = i + nSegment;
+		idxFace++;
 	}
 
-	for (i = 0; i < nSpoke*2; ++i) {
-		vs1.push_back(i + nSegment * 8); // inR2 top
-		vs2.push_back(i + nSegment * 8 + nSpoke * 2); // inR2 bot
-		vs3.push_back(i + nSegment * 8 + nSpoke * 4); // outR1 top
-		vs4.push_back(i + nSegment * 8 + nSpoke * 6); // outR1 bot
+	// link v2 to v4
+	for (i = 0; i < nSegment; i++) {
+		face[idxFace].nVerts = 4;
+		face[idxFace].vert = new VertexID[face[idxFace].nVerts];
+		face[idxFace].vert[0].vertIndex = i + nSegment;
+		face[idxFace].vert[1].vertIndex = (i < nSegment - 1) ? i + nSegment + 1 : nSegment;
+		face[idxFace].vert[2].vertIndex = (i < nSegment - 1) ? i + nSegment * 3 + 1 : nSegment * 3;
+		face[idxFace].vert[3].vertIndex = i + nSegment * 3;
+		idxFace++;
 	}
 
-	for (i = 0; i < nSpoke * 2; ++i) {
-		// inR2 vertical
-		vs5.push_back(i + nSegment * 8);
-		vs5.push_back(i + nSegment * 8 + nSpoke * 2);
-
-		// outR1 vertical
-		vs6.push_back(i + nSegment * 8 + nSpoke * 4);
-		vs6.push_back(i + nSegment * 8 + nSpoke * 6);
+	// link v4 to v3
+	for (i = 0; i < nSegment; i++) {
+		face[idxFace].nVerts = 4;
+		face[idxFace].vert = new VertexID[face[idxFace].nVerts];
+		face[idxFace].vert[0].vertIndex = i + nSegment * 3;
+		face[idxFace].vert[1].vertIndex = (i < nSegment - 1) ? i + nSegment * 3 + 1 : nSegment * 3;
+		face[idxFace].vert[2].vertIndex = (i < nSegment - 1) ? i + nSegment * 2 + 1 : nSegment * 2;
+		face[idxFace].vert[3].vertIndex = i + nSegment * 2;
+		idxFace++;
 	}
 
-	vector<vector<int>> faces{};
+	// link v3 to v1
+	for (i = 0; i < nSegment; i++) {
+		face[idxFace].nVerts = 4;
+		face[idxFace].vert = new VertexID[face[idxFace].nVerts];
+		face[idxFace].vert[0].vertIndex = i + nSegment * 2;
+		face[idxFace].vert[1].vertIndex = (i < nSegment - 1) ? i + nSegment * 2 + 1 : nSegment * 2;
+		face[idxFace].vert[2].vertIndex = (i < nSegment - 1) ? i + 1 : 0;
+		face[idxFace].vert[3].vertIndex = i;
+		idxFace++;
+	}
 
-	// 1-3		5-7
-	// | |		| |
-	// 2-4		6-8
-	grid(faces, v1, v2);
-	grid(faces, v2, v4);
-	grid(faces, v4, v3);
-	grid(faces, v3, v1);
+	// link v5 to v6
+	for (i = 0; i < nSegment; i++) {
+		face[idxFace].nVerts = 4;
+		face[idxFace].vert = new VertexID[face[idxFace].nVerts];
+		face[idxFace].vert[0].vertIndex = i + nSegment * 4;
+		face[idxFace].vert[1].vertIndex = (i < nSegment - 1) ? i + nSegment * 4 + 1 : nSegment * 4;
+		face[idxFace].vert[2].vertIndex = (i < nSegment - 1) ? i + nSegment * 5 + 1 : nSegment * 5;
+		face[idxFace].vert[3].vertIndex = i + nSegment * 5;
+		idxFace++;
+	}
 
-	grid(faces, v5, v6);
-	grid(faces, v6, v8);
-	grid(faces, v8, v7);
-	grid(faces, v7, v5);
+	// link v6 to v8
+	for (i = 0; i < nSegment; i++) {
+		face[idxFace].nVerts = 4;
+		face[idxFace].vert = new VertexID[face[idxFace].nVerts];
+		face[idxFace].vert[0].vertIndex = i + nSegment * 5;
+		face[idxFace].vert[1].vertIndex = (i < nSegment - 1) ? i + nSegment * 5 + 1 : nSegment * 5;
+		face[idxFace].vert[2].vertIndex = (i < nSegment - 1) ? i + nSegment * 7 + 1 : nSegment * 7;
+		face[idxFace].vert[3].vertIndex = i + nSegment * 7;
+		idxFace++;
+	}
 
-	ladder(faces, vs1, vs3);
-	ladder(faces, vs2, vs4);
-	ladder(faces, vs5, vs6);
+	// link v8 to v7
+	for (i = 0; i < nSegment; i++) {
+		face[idxFace].nVerts = 4;
+		face[idxFace].vert = new VertexID[face[idxFace].nVerts];
+		face[idxFace].vert[0].vertIndex = i + nSegment * 7;
+		face[idxFace].vert[1].vertIndex = (i < nSegment - 1) ? i + nSegment * 7 + 1 : nSegment * 7;
+		face[idxFace].vert[2].vertIndex = (i < nSegment - 1) ? i + nSegment * 6 + 1 : nSegment * 6;
+		face[idxFace].vert[3].vertIndex = i + nSegment * 6;
+		idxFace++;
+	}
 
-	if (faces.size() != numFaces)
+	// link v7 to v5
+	for (i = 0; i < nSegment; i++) {
+		face[idxFace].nVerts = 4;
+		face[idxFace].vert = new VertexID[face[idxFace].nVerts];
+		face[idxFace].vert[0].vertIndex = i + nSegment * 6;
+		face[idxFace].vert[1].vertIndex = (i < nSegment - 1) ? i + nSegment * 6 + 1 : nSegment * 6;
+		face[idxFace].vert[2].vertIndex = (i < nSegment - 1) ? i + nSegment * 4 + 1 : nSegment * 4;
+		face[idxFace].vert[3].vertIndex = i + nSegment * 4;
+		idxFace++;
+	}
+
+	// link vs1 to vs3
+	for (i = 0; i < nSpoke * 2; i += 2) {
+		face[idxFace].nVerts = 4;
+		face[idxFace].vert = new VertexID[face[idxFace].nVerts];
+		face[idxFace].vert[0].vertIndex = nSegment * 8 + i;
+		face[idxFace].vert[1].vertIndex = nSegment * 8 + i + 1;
+		face[idxFace].vert[2].vertIndex = nSegment * 8 + nSpoke * 4 + i + 1;
+		face[idxFace].vert[3].vertIndex = nSegment * 8 + nSpoke * 4 + i;
+		idxFace++;
+	}
+
+	// link vs2 to vs4
+	for (i = 0; i < nSpoke * 2; i += 2) {
+		face[idxFace].nVerts = 4;
+		face[idxFace].vert = new VertexID[face[idxFace].nVerts];
+		face[idxFace].vert[0].vertIndex = nSegment * 8 + nSpoke * 2 + i;
+		face[idxFace].vert[1].vertIndex = nSegment * 8 + nSpoke * 2 + i + 1;
+		face[idxFace].vert[2].vertIndex = nSegment * 8 + nSpoke * 6 + i + 1;
+		face[idxFace].vert[3].vertIndex = nSegment * 8 + nSpoke * 6 + i;
+		idxFace++;
+	}
+
+	// link vs5 to vs6
+	for (i = 0; i < nSpoke * 2; i++) {
+		//	// inR2 vertical
+	//	vs5.push_back(i + nSegment * 8);
+	//	vs5.push_back(i + nSegment * 8 + nSpoke * 2);
+
+	//	// outR1 vertical
+	//	vs6.push_back(i + nSegment * 8 + nSpoke * 4);
+	//	vs6.push_back(i + nSegment * 8 + nSpoke * 6);
+
+		face[idxFace].nVerts = 4;
+		face[idxFace].vert = new VertexID[face[idxFace].nVerts];
+		face[idxFace].vert[0].vertIndex = nSegment * 8 + i;
+		face[idxFace].vert[1].vertIndex = nSegment * 8 + i + nSpoke * 2;
+		face[idxFace].vert[2].vertIndex = nSegment * 8 + i + nSpoke * 6;
+		face[idxFace].vert[3].vertIndex = nSegment * 8 + i + nSpoke * 4;
+		idxFace++;
+	}
+
+
+	/*if (faces.size() != numFaces)
 		throw runtime_error("nooooo");
 
 	for (i = 0; i < numFaces; i++) {
@@ -979,7 +1164,7 @@ void Mesh::CreateWheel(
 		for (int j = 0; j < 4; j++) {
 			face[i].vert[j].vertIndex = faces[i][j];
 		}
-	}
+	}*/
 }
 
 void Mesh::CreateSlider(
@@ -993,8 +1178,8 @@ void Mesh::CreateSlider(
 
 	double hTop1 = z / 2;
 	double hBot1 = -z / 2;
-	double hTop2 = (z - thickness) / 2;
-	double hBot2 = -(z - thickness) / 2;;
+	double hTop2 = (z - thickness * 2) / 2;
+	double hBot2 = -(z - thickness * 2) / 2;;
 
 	double xOut = x / 2;
 	double yOut = y / 2;
