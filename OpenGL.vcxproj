@@ -141,11 +141,16 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="supportClass.cpp" />
+    <ClCompile Include="Tut1.cpp" />
+    <ClCompile Include="Tut2.cpp" />
+    <ClCompile Include="Tut3.cpp" />
+    <ClCompile Include="Tut4.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lab.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="supportClass.h" />
+    <ClInclude Include="tutorial.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
